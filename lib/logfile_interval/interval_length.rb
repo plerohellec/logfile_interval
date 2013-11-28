@@ -1,9 +1,9 @@
 module LogfileInterval
   class IntervalLength
-    MAX_PERIODS = { 5.minutes.to_i => 6.hours,
-                    1.hour.to_i    => 1.day,
-                    1.day.to_i     => 1.month,
-                    1.month.to_i   => 1.years }
+    MAX_PERIODS = { 5 * 60           => 6 * 3600,
+                    3600             => 3600 * 24,
+                    3600 * 24        => 3600 * 24 * 30,
+                    3600 * 24 * 30   => 365 * 3600 * 24 }
     LENGTHS = MAX_PERIODS.keys.sort
 
     attr_reader :length
