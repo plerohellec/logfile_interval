@@ -1,6 +1,6 @@
 # LogfileInterval
 
-TODO: Write a gem description
+Logfile parser and aggregator
 
 ## Installation
 
