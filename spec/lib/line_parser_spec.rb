@@ -34,6 +34,9 @@ module LogfileInterval
         line = 'abcdef'
         lambda { AccessLog.new(line) }.should raise_error InvalidLine
       end
+
+      it 'must fail unless a regex is set'
+      it 'must fail unless a column is configured'
     end
   end
 end

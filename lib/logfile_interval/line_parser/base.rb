@@ -2,7 +2,8 @@ module LogfileInterval
   module LineParser
     AGGREGATION_FUNCTIONS = [ :increment, :average, :timestamp, :group ]
 
-    class InvalidLine < StandardError; end
+    class InvalidLine         < StandardError; end
+    class ConfigurationError  < StandardError; end
 
     class Base
       class << self
@@ -33,6 +34,9 @@ module LogfileInterval
         end
 
         def parse(line)
+          raise ConfigurationError, 'There must be at least 1 configured column' unless columns.any?
+          raise ConfigurationError, 'A regex must be set' unless regex
+
           match_data = regex.match(line)
           raise InvalidLine unless match_data
           raise InvalidLine unless match_data.size >= columns.size+1
