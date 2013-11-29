@@ -6,7 +6,7 @@ module LogfileInterval
 
     class Base
       class << self
-        attr_reader :regex, :columns
+        attr_reader :regex
 
         def columns
           @columns ||= {}
@@ -28,29 +28,40 @@ module LogfileInterval
           columns[name] = { :pos => pos, :agg_function => agg_function, :conversion => conversion }
 
           define_method(name) do
-            case self.class.columns[name][:conversion]
-            when :integer then @data[name].to_i
-            when :float   then @data[name].to_f
-            else @data[name]
-            end
+            @data[name]
           end
         end
 
         def parse(line)
-          regex.match(line)
+          match_data = regex.match(line)
+          raise InvalidLine unless match_data
+          raise InvalidLine unless match_data.size >= columns.size+1
+
+          data = {}
+          columns.each do |name, options|
+            val = match_data[options[:pos]]
+            data[name] = convert(val, options[:conversion])
+          end
+          data
+        end
+
+        def create(line)
+          self.class.new(line)
+        end
+
+        private
+
+        def convert(val, conversion)
+          case conversion
+          when :integer then val.to_i
+          when :float   then val.to_f
+          else val
+          end
         end
       end
 
       def initialize(line)
-        @data = {}
-
-        match_data = self.class.parse(line)
-        raise InvalidLine unless match_data
-        raise InvalidLine unless match_data.size >= self.class.columns.size+1
-
-        self.class.columns.each do |name, options|
-          @data[name] = match_data[options[:pos]]
-        end
+        @data = self.class.parse(line)
       end
 
       def time
