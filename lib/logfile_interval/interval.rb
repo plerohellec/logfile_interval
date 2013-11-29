@@ -43,12 +43,6 @@ module LogfileInterval
       @size += 1
     end
 
-    def add_sub_interval(interval)
-      raise BadLength unless interval.length==interval_length.lower.length
-      raise OutOfRange unless (interval.end_time<self.end_time || interval.start_time>=self.start_time)
-      @size += interval.size
-    end
-
     def interval_length
       @interval_length ||= IntervalLength.new(self.length)
     end

@@ -52,16 +52,5 @@ module LogfileInterval
       uas.increment(access.ua)
       referers.increment(access.referer)
     end
-
-    def add_sub_interval(interval)
-      raise ArgumentError unless timing.is_a?(AccessInterval)
-      super(interval)
-
-      ips.merge(interval.ip)
-      codes.merge(interval.code)
-      exts.merge(interval.ext)
-      uas.merge(interval.ua)
-      referers.merge(interval.referer)
-    end
   end
 end
