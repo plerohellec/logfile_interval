@@ -20,7 +20,6 @@ module LogfileInterval
 
         def parse(line)
           @data = {}
-
           match_data = regex.match(line)
           columns.each do |name, options|
             val = match_data[options[:pos]]

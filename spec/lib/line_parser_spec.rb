@@ -20,10 +20,21 @@ module LogfileInterval
       end
     end
 
+    class NoRegexLog < Base
+      add_column :name => 'ip',        :pos => 1, :agg_function => :group
+    end
+
+    class NoColumnLog < Base
+      set_regex /^([\d\.]+)\s+\S+\s+\S+\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+(\d+)\s+"([^"]*)"\s+"([^"]+)"$/
+    end
+
     describe AccessLog do
+      before :each do
+        @line = '74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.22 (KHTML, like Gecko) Ubuntu Chromium/25.0.1364.160 Chrome/25.0.1364.160 Safari/537.22"'
+      end
+
       it 'parses an access.log line' do
-        line = '74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.22 (KHTML, like Gecko) Ubuntu Chromium/25.0.1364.160 Chrome/25.0.1364.160 Safari/537.22"'
-        parsed_line = AccessLog.new(line)
+        parsed_line = AccessLog.new(@line)
         parsed_line.ip.should == '74.75.19.145'
         parsed_line.length.should == 7855
         parsed_line.timestamp.should == '31/Mar/2013:06:54:12 -0700'
@@ -35,8 +46,13 @@ module LogfileInterval
         lambda { AccessLog.new(line) }.should raise_error InvalidLine
       end
 
-      it 'must fail unless a regex is set'
-      it 'must fail unless a column is configured'
+      it 'must fail unless a regex is set' do
+        lambda { NoRegexLog.new(@line) }.should raise_error ConfigurationError
+      end
+
+      it 'must fail unless a column is configured'do
+        lambda { NoColumnLog.new(@line) }.should raise_error ConfigurationError
+      end
     end
   end
 end
