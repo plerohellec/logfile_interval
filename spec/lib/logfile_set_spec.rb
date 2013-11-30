@@ -7,7 +7,7 @@ module LogfileInterval
   describe LogfileSet do
     before :each do
       @logfiles = ["#{data_dir}/access.log.2", "#{data_dir}/access.log.1"]
-      @set = LogfileSet.new(LineParser::AccessLog, @logfiles)
+      @set = LogfileSet.new(@logfiles, LineParser::AccessLog)
     end
 
     it 'ordered_filenames should return the most recent file first' do

@@ -1,6 +1,6 @@
 module LogfileInterval
   class LogfileSet
-    def initialize(parser, filenames)
+    def initialize(filenames, parser)
       @parser    = parser
       @filenames = filenames
     end

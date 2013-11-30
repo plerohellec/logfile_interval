@@ -1,5 +1,5 @@
 require 'spec_helper'
-require File.join(File.dirname(__FILE__), '..', 'support/lib/access_log')
+require File.join(File.dirname(__FILE__), '..', 'support/lib/timing_log')
 
 module LogfileInterval
   data_dir = File.join(File.dirname(__FILE__), '..', 'support/logfiles')
@@ -22,6 +22,11 @@ module LogfileInterval
       end
 
       it 'rejects record out of interval' do
+        oor_record = LineParser::TimingLog.create_record('1385942450, posts#index, 100, 20000')
+        lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
+      end
+
+      it 'rejects record at interval start_time' do
         oor_record = LineParser::TimingLog.create_record('1385942100, posts#index, 100, 20000')
         lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
       end
