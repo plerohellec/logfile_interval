@@ -1,8 +1,8 @@
 module LogfileInterval
   class LogfileSet
-    def initialize(line_klass, filenames)
+    def initialize(parser, filenames)
+      @parser    = parser
       @filenames = filenames
-      @line_klass = line_klass
     end
 
     def existing_filenames
@@ -11,8 +11,8 @@ module LogfileInterval
 
     def ordered_filenames
       time_for_file = existing_filenames.inject({}) do |h, filename|
-        file = Logfile.new(@line_klass, filename)
-        h[filename] = file.first_timestamp
+        file = Logfile.new(filename)
+        h[filename] = file.first_timestamp(@parser)
         h
       end
       time_for_file.to_a.sort_by { |arr| arr[1] }.map { |arr| arr[0] }.reverse
@@ -20,8 +20,8 @@ module LogfileInterval
 
     def each_parsed_line
       ordered_filenames.each do |filename|
-        tfile = Logfile.new(@line_klass, filename)
-        tfile.each_parsed_line do |record|
+        tfile = Logfile.new(filename)
+        tfile.each_parsed_line(@parser) do |record|
           yield record
         end
       end
@@ -29,7 +29,7 @@ module LogfileInterval
 
     def each_line
       ordered_filenames.each do |filename|
-        tfile = Logfile.new(@line_klass, filename)
+        tfile = Logfile.new(filename)
         tfile.each_line do |line|
           yield line
         end

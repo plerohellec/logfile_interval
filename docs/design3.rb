@@ -56,10 +56,16 @@ module LogfileInterval
   end
 
   class LogfileSet
+    def initialize(parser, filenames_array)
+    end
+
+    def ordered_filenams
+    end
+
     def each_line
     end
 
-    def each_parsed_line(parser)
+    def each_parsed_line
     end
   end
 
@@ -137,8 +143,8 @@ logfile_iterator.each_parsed_line(parser) do |record|
   puts record.time
 end
 
-set_iterator = LogfileInterval::LogfileSet.new(logfiles)
-set_iterator.each_parsed_line(parser) do |record|
+set_iterator = LogfileInterval::LogfileSet.new(parser, logfiles)
+set_iterator.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
 end
 
