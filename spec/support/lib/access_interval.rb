@@ -37,9 +37,9 @@ module LogfileInterval
       @referers = Counter.new
     end
 
-    def self.each_interval_backward(filenames, interval_length, options={}, &block)
+    def self.each_interval(filenames, interval_length, options={}, &block)
       logfile_set = LogfileSet.new(AccessLine, filenames)
-      Interval.each_interval_backward(AccessInterval, logfile_set, interval_length, options, &block)
+      Interval.each_interval(AccessInterval, logfile_set, interval_length, options, &block)
     end
 
     def add(access)

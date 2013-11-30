@@ -49,9 +49,9 @@ module LogfileInterval
       @alf.first_timestamp.should == Time.new(2012, 01, 01, 00, 57, 47, '-08:00')
     end
       
-    it 'each_line_backward should enumerate each line backwards' do
+    it 'each_line should enumerate each line backwards' do
       lines = []
-      @alf.each_line_backward do |line|
+      @alf.each_line do |line|
         lines << AccessLine.new(line).parse
       end
       lines.first.timestamp.should == Time.new(2012, 01, 01, 16, 30, 51, '-08:00')

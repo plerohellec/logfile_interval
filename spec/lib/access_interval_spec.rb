@@ -34,11 +34,11 @@ module LogfileInterval
       lambda { ai.add(al.parse) }.should raise_error(Interval::OutOfRange)
     end
 
-    context 'each_interval_backward' do
+    context 'each_interval' do
       before :all do
         Time.stub(:now).and_return(Time.new(2013,06,23,17,1,0,'-08:00'))
         @intervals = []
-        AccessInterval.each_interval_backward([@file1, @file2], @length) do |interval|
+        AccessInterval.each_interval([@file1, @file2], @length) do |interval|
           @intervals << interval
         end
       end
@@ -51,7 +51,7 @@ module LogfileInterval
       it 'silently ignores files that do not exist' do
         intervals = []
         Time.stub(:now).and_return(Time.new(2013,06,23,17,1,0,'-08:00'))
-        AccessInterval.each_interval_backward([@file1, @file2, 'foobar'], @length) do |interval|
+        AccessInterval.each_interval([@file1, @file2, 'foobar'], @length) do |interval|
           intervals << interval
         end
         intervals.size.should == 3
@@ -69,7 +69,7 @@ module LogfileInterval
       it 'does an empty interval for segment following last bit of data and now' do
         intervals = []
         Time.stub(:now).and_return(Time.new(2013,06,23,17, 11,0,'-08:00'))
-        AccessInterval.each_interval_backward([@file1], @length) do |interval|
+        AccessInterval.each_interval([@file1], @length) do |interval|
           intervals << interval
         end
         intervals.size.should == 3

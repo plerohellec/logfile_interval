@@ -14,7 +14,7 @@ module LogfileInterval
       end
     end
 
-    def each_line_backward
+    def each_line
       f = FileBackward.new(@filename)
       while(line = f.gets)
         yield line
@@ -22,8 +22,8 @@ module LogfileInterval
       f.close
     end
 
-    def each_record_backward
-      each_line_backward do |line|
+    def each_parsed_line
+      each_line do |line|
         record = @line_klass.new(line)
         parsed = record.parse
         yield parsed if parsed

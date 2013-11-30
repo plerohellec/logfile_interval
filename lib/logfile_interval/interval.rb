@@ -14,12 +14,12 @@ module LogfileInterval
       @size = 0
     end
 
-    def self.each_interval_backward(interval_klass, logfile_set, interval_length, options={})
+    def self.each_interval(interval_klass, logfile_set, interval_length, options={})
       secs = (Time.now.to_i / interval_length.to_i) * interval_length.to_i
       rounded_end_time = Time.at(secs)
       current_interval = interval_klass.new(rounded_end_time, interval_length, options)
 
-      logfile_set.each_record_backward do |record|
+      logfile_set.each_parsed_line do |record|
         next if record.timestamp > current_interval.end_time
         while record.timestamp <= current_interval.start_time
           yield current_interval
@@ -32,7 +32,7 @@ module LogfileInterval
     end
 
     def self.last_interval(interval_klass, logfile_set, interval_length, options={})
-      each_interval_backward(interval_klass, logfile_set, interval_length, options) do |interval|
+      each_interval(interval_klass, logfile_set, interval_length, options) do |interval|
         return interval
       end
     end
