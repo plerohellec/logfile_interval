@@ -38,8 +38,8 @@ module LogfileInterval
           raise ConfigurationError, 'A regex must be set' unless regex
 
           match_data = regex.match(line)
-          raise InvalidLine unless match_data
-          raise InvalidLine unless match_data.size >= columns.size+1
+          return nil unless match_data
+          return nil unless match_data.size >= columns.size+1
 
           data = {}
           columns.each do |name, options|
@@ -49,8 +49,10 @@ module LogfileInterval
           data
         end
 
-        def create(line)
-          self.class.new(line)
+        def create_record(line)
+          record = new(line)
+          return record if record.valid?
+          return nil
         end
 
         private
@@ -66,6 +68,11 @@ module LogfileInterval
 
       def initialize(line)
         @data = self.class.parse(line)
+        @valid = @data ? true : false
+      end
+
+      def valid?
+        @valid
       end
 
       def time

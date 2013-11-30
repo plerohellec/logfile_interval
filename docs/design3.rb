@@ -1,13 +1,4 @@
 module LogfileInterval
-  class Logfile
-  end
-
-  class LogfileSet
-  end
-
-  class Interval
-  end
-
   module LineParser
     class Base
       class << self
@@ -42,6 +33,27 @@ module LogfileInterval
         @data = self.class.parse(line)
       end
     end
+  end
+
+  class Logfile
+    def initialize(filename)
+    end
+
+    def each_line
+    end
+
+    def each_parsed_line(parser)
+      each_line do |line|
+        yield parser.create_record(line)
+      end
+    end
+
+  end
+
+  class LogfileSet
+  end
+
+  class Interval
   end
 
 end

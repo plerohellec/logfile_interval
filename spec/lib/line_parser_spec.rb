@@ -41,9 +41,26 @@ module LogfileInterval
         parsed_line.time.should == Time.strptime('31/Mar/2013:06:54:12 -0700', '%d/%b/%Y:%H:%M:%S %z')
       end
 
-      it 'should raise an error id line is malformed' do
+      context :create_record do
+
+        it 'instanciates a new AccessLog object' do
+          record = AccessLog.create_record(@line)
+          record.should be_a(AccessLog)
+          record.ip.should == '74.75.19.145'
+        end
+
+        it 'returns nil if line is malformed' do
+          line = 'abcdef'
+          record = AccessLog.create_record(line)
+          record.should be_nil
+        end
+      end
+
+      it 'returns an invalid record if line is malformed' do
         line = 'abcdef'
-        lambda { AccessLog.new(line) }.should raise_error InvalidLine
+        record = 'unset'
+        lambda { record = AccessLog.new(line) }.should_not raise_error
+        record.valid?.should be_false
       end
 
       it 'must fail unless a regex is set' do
