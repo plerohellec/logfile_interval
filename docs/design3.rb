@@ -70,7 +70,8 @@ module LogfileInterval
   end
 
   class IntervalBuilder
-    def initialize(logfile_set, parser, length)
+    def initialize(logfile_set, length)
+      parser = logfile_set.parser
     end
 
     def each_interval
