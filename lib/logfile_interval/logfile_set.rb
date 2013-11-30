@@ -1,5 +1,7 @@
 module LogfileInterval
   class LogfileSet
+    attr_reader :parser
+    
     def initialize(filenames, parser)
       @parser    = parser
       @filenames = filenames

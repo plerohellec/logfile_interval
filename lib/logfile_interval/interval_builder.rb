@@ -2,9 +2,9 @@ module LogfileInterval
   class IntervalBuilder
     attr_reader :logfile_set, :parser, :length
 
-    def initialize(logfile_set, parser, length)
+    def initialize(logfile_set, length)
       @logfile_set  = logfile_set
-      @parser       = parser
+      @parser       = logfile_set.parser
       @length       = length
     end
 

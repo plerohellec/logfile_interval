@@ -143,13 +143,15 @@ logfile_iterator.each_parsed_line(parser) do |record|
   puts record.time
 end
 
-set_iterator = LogfileInterval::LogfileSet.new(parser, logfiles)
+set_iterator = LogfileInterval::LogfileSet.new(logfiles, parser)
 set_iterator.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
 end
 
-interval_builder = LogfileInterval::Interval.new(parser, logfiles)
+length = 5.minutes
+interval_builder = LogfileInterval::IntervalBuilder.new(logfiles, length)
 interval_builder.each_interval do |interval|
+  puts interval.class  # LogfileInterval::Interval
   puts interval.start_time
   puts interval.length
   interval[:ip].each do |ip, count|

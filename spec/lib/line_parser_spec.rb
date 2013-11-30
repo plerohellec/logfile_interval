@@ -1,5 +1,4 @@
 require 'spec_helper'
-require File.join(File.dirname(__FILE__), '..', 'support/lib/access_log')
 
 module LogfileInterval
   data_dir = File.join(File.dirname(__FILE__), '..', 'support/logfiles')
