@@ -19,6 +19,11 @@ module LogfileInterval
           @data
         end
 
+        def create_record(line)
+          record = new(line)
+          return record.valid? ? record : nil
+        end
+
         def convert(val, conversion)
         end
       end
@@ -44,25 +49,82 @@ module LogfileInterval
 
     def each_parsed_line(parser)
       each_line do |line|
-        yield parser.create_record(line)
+        record = parser.create_record(line)
+        yield record if record
       end
     end
-
   end
 
   class LogfileSet
+    def each_line
+    end
+
+    def each_parsed_line(parser)
+    end
+  end
+
+  class IntervalBuilder
+    def initialize(logfile_set, parser, length)
+    end
+
+    def each_interval
+      interval = Interval.new(now, length)
+      set.each_parsed_line(parser) do |record|
+        while record.time < interval.start_time do
+          yield interval
+          interval = Interval.new(interval.start_time, length)
+        end
+        interval.add(record)
+      end
+    end
+  end
+
+  class Counter < Hash
+    def increment(key)
+      self[key] = self[key] ? self[key] + 1 : 1
+    end
   end
 
   class Interval
-  end
+    def initialize(end_time, length, parser)
+      @data = { :size => 0 }
+      parser.columns.each do |name, options|
+        case options[:agg_function]
+        when :sum       then @data[name] = 0
+        when :average   then @data[name] = 0
+        when :group     then @data[name] = Counter.new
+        end
+      end
+    end
 
+    def [](name)
+      case parser[name][:agg_function]
+      when :sum       then @data[name]
+      when :average   then @data[name].to_f / size.to_f
+      when :group     then @data[name]
+      end
+    end
+
+    def add(record)
+      return unless record.valid?
+      raise ParserMismatch unless record.class == parser
+
+      @data[:size] += 1
+      parser.columns.each do |name, options|
+        case options[:agg_function]
+        when :sum       then @data[name] += record[name]
+        when :average   then @data[name] += record[name]
+        when :group     then @data[name].increment(record[name])
+        end
+      end
+    end
+  end
 end
 
 logfiles = [ 'access.log', 'access.log.1', 'access.log.2' ]
 logfile = logfiles.first
 
 logfile_iterator = LogfileInterval::Logfile.new(logfile)
-
 logfile_iterator.each_line do |line|
   puts line.class # String
   puts line
@@ -75,8 +137,12 @@ logfile_iterator.each_parsed_line(parser) do |record|
   puts record.time
 end
 
-interval_builder = LogfileInterval::Interval.new(parser, logfiles)
+set_iterator = LogfileInterval::LogfileSet.new(logfiles)
+set_iterator.each_parsed_line(parser) do |record|
+  puts record.class # LineParser::AccessLog
+end
 
+interval_builder = LogfileInterval::Interval.new(parser, logfiles)
 interval_builder.each_interval do |interval|
   puts interval.start_time
   puts interval.length

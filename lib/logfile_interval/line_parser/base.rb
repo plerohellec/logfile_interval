@@ -1,6 +1,6 @@
 module LogfileInterval
   module LineParser
-    AGGREGATION_FUNCTIONS = [ :increment, :average, :timestamp, :group ]
+    AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :group ]
 
     class InvalidLine         < StandardError; end
     class ConfigurationError  < StandardError; end
