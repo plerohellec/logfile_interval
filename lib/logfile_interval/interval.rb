@@ -19,13 +19,13 @@ module LogfileInterval
       rounded_end_time = Time.at(secs)
       current_interval = interval_klass.new(rounded_end_time, interval_length, options)
 
-      logfile_set.each_item_backward do |item|
-        next if item.timestamp > current_interval.end_time
-        while item.timestamp <= current_interval.start_time
+      logfile_set.each_record_backward do |record|
+        next if record.timestamp > current_interval.end_time
+        while record.timestamp <= current_interval.start_time
           yield current_interval
           current_interval = interval_klass.new(current_interval.start_time, interval_length, options)
         end
-        current_interval.add(item)
+        current_interval.add(record)
       end
 
       yield current_interval if current_interval.size>0
@@ -37,9 +37,9 @@ module LogfileInterval
       end
     end
 
-    def add(item)
-      raise OutOfRange, 'too recent' if item.timestamp>@end_time
-      raise OutOfRange, 'too old'    if item.timestamp<=@start_time
+    def add(record)
+      raise OutOfRange, 'too recent' if record.timestamp>@end_time
+      raise OutOfRange, 'too old'    if record.timestamp<=@start_time
       @size += 1
     end
 

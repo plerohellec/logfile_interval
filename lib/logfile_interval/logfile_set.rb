@@ -18,11 +18,11 @@ module LogfileInterval
       time_for_file.to_a.sort_by { |arr| arr[1] }.map { |arr| arr[0] }.reverse
     end
 
-    def each_item_backward
+    def each_record_backward
       ordered_filenames.each do |filename|
         tfile = Logfile.new(@line_klass, filename)
-        tfile.each_item_backward do |item|
-          yield item
+        tfile.each_record_backward do |record|
+          yield record
         end
       end
     end
@@ -36,9 +36,9 @@ module LogfileInterval
       end
     end
 
-    def last_item
-      each_item_backward do |item|
-        return item
+    def last_record
+      each_record_backward do |record|
+        return record
       end
     end
   end

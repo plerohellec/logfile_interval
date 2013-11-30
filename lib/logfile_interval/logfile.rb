@@ -22,10 +22,10 @@ module LogfileInterval
       f.close
     end
 
-    def each_item_backward
+    def each_record_backward
       each_line_backward do |line|
-        item = @line_klass.new(line)
-        parsed = item.parse
+        record = @line_klass.new(line)
+        parsed = record.parse
         yield parsed if parsed
       end
     end
