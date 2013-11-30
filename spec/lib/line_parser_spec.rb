@@ -63,6 +63,22 @@ module LogfileInterval
         lambda { NoColumnLog.new(@line) }.should raise_error ConfigurationError
       end
     end
+
+    describe TimingLog do
+      before :each do
+        # 1385942400 = 2013/12/01 16:00:00
+        @line = '1385942400, posts#index, 100, 20000'
+      end
+
+      it 'parses a timing line' do
+        record = TimingLog.create_record(@line)
+        record.should_not be_nil
+        record.time.should == Time.new(2013, 12, 01, 16, 00, 00, '-08:00')
+        record.action.should == 'posts#index'
+        record.total_time.should == 100
+        record.num_bytes.should == 20000
+      end
+    end
   end
 end
 

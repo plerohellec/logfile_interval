@@ -1,6 +1,6 @@
 module LogfileInterval
   class AccessInterval
-    include Interval
+#     include Interval
 
     attr_reader :ips, :codes, :exts, :uas, :referers
 

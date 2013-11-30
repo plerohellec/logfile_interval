@@ -57,6 +57,9 @@ module LogfileInterval
 
         private
 
+        def validate_column_options(options)
+        end
+
         def convert(val, conversion)
           case conversion
           when :integer then val.to_i
@@ -77,6 +80,10 @@ module LogfileInterval
 
       def time
         raise NotImplemented
+      end
+
+      def [](name)
+        @data[name]
       end
     end
   end

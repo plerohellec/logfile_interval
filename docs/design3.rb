@@ -111,7 +111,7 @@ module LogfileInterval
       end
     end
 
-    def add(record)
+    def add_record(record)
       return unless record.valid?
       raise ParserMismatch unless record.class == parser
 

@@ -1,50 +1,53 @@
 module LogfileInterval
-  module Interval
-    attr_reader   :start_time, :end_time, :length
-    attr_accessor :size
+  class Interval
+    attr_reader   :start_time, :end_time, :length, :parser
+    attr_reader   :size
 
     class OutOfRange < StandardError; end
     class BadLength  < StandardError; end
+    class ParserMismatch < StandardError; end
 
-    def initialize(end_time, length)
+    def initialize(end_time, length, parser)
       raise ArgumentError, 'end_time must be round' unless (end_time.to_i % length.to_i == 0)
       @end_time   = end_time
       @start_time = end_time - length
       @length     = length
+      @parser     = parser
       @size = 0
-    end
 
-    def self.each_interval(interval_klass, logfile_set, interval_length, options={})
-      secs = (Time.now.to_i / interval_length.to_i) * interval_length.to_i
-      rounded_end_time = Time.at(secs)
-      current_interval = interval_klass.new(rounded_end_time, interval_length, options)
-
-      logfile_set.each_parsed_line do |record|
-        next if record.timestamp > current_interval.end_time
-        while record.timestamp <= current_interval.start_time
-          yield current_interval
-          current_interval = interval_klass.new(current_interval.start_time, interval_length, options)
+      @data = {}
+      parser.columns.each do |name, options|
+        case options[:agg_function]
+        when :sum       then @data[name] = 0
+        when :average   then @data[name] = 0
+        when :group     then @data[name] = Counter.new
         end
-        current_interval.add(record)
-      end
-
-      yield current_interval if current_interval.size>0
-    end
-
-    def self.last_interval(interval_klass, logfile_set, interval_length, options={})
-      each_interval(interval_klass, logfile_set, interval_length, options) do |interval|
-        return interval
       end
     end
 
-    def add(record)
-      raise OutOfRange, 'too recent' if record.timestamp>@end_time
-      raise OutOfRange, 'too old'    if record.timestamp<=@start_time
+    def [](name)
+      case parser.columns[name][:agg_function]
+      when :sum       then @data[name]
+      when :average   then size>0 ? @data[name].to_f / size.to_f : 0.0
+      when :group     then @data[name]
+      end
+    end
+
+    def add_record(record)
+      return unless record.valid?
+      raise ParserMismatch unless record.class == parser
+      raise OutOfRange, 'too recent' if record.time>@end_time
+      raise OutOfRange, 'too old'    if record.time<=@start_time
+
       @size += 1
-    end
 
-    def interval_length
-      @interval_length ||= IntervalLength.new(self.length)
+      parser.columns.each do |name, options|
+        case options[:agg_function]
+        when :sum       then @data[name] += record[name]
+        when :average   then @data[name] += record[name]
+        when :group     then @data[name].increment(record[name])
+        end
+      end
     end
 
     def ==(i)
