@@ -120,35 +120,23 @@ module LogfileInterval
 
   class Interval
     def initialize(end_time, length, parser)
-      @data = { :size => 0 }
+      @data = {}
       parser.columns.each do |name, options|
-        case options[:agg_function]
-        when :sum       then @data[name] = 0
-        when :average   then @data[name] = 0
-        when :group     then @data[name] = Counter.new
-        end
+        @data[name] = options[:aggregator].new
       end
     end
 
     def [](name)
-      case parser[name][:agg_function]
-      when :sum       then @data[name]
-      when :average   then @data[name].to_f / size.to_f
-      when :group     then @data[name]
-      end
+      @data[name].value
     end
 
     def add_record(record)
       return unless record.valid?
       raise ParserMismatch unless record.class == parser
 
-      @data[:size] += 1
+      @size += 1
       parser.columns.each do |name, options|
-        case options[:agg_function]
-        when :sum       then @data[name] += record[name]
-        when :average   then @data[name] += record[name]
-        when :group     then @data[name].increment(record[name])
-        end
+        @data[name].add(record[name])
       end
     end
   end
