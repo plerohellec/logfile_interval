@@ -11,7 +11,7 @@ module LogfileInterval
       interval.size.should == 0
       interval[:total_time].should == 0
       interval[:num_bytes].should == 0
-      interval[:action].should be_an_instance_of(Counter)
+      interval[:action].should be_a(Hash)
     end
 
     context :add_record do
