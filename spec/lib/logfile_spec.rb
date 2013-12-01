@@ -6,12 +6,12 @@ module LogfileInterval
 
   describe Logfile do
     before :each do
-      @alf = Logfile.new("#{data_dir}/access.log")
+      @alf = Logfile.new("#{data_dir}/access.log", LineParser::AccessLog)
     end
 
     it 'first_timestamp returns time of first line in file' do
       #01/Jan/2012:00:57:47 -0800
-      @alf.first_timestamp(LineParser::AccessLog).should == Time.new(2012, 01, 01, 00, 57, 47, '-08:00')
+      @alf.first_timestamp.should == Time.new(2012, 01, 01, 00, 57, 47, '-08:00')
     end
 
     it 'each_line should enumerate each line in file backwards' do
@@ -26,7 +26,7 @@ module LogfileInterval
 
     it 'each_parsed_line should enumerate each line backwards' do
       records = []
-      @alf.each_parsed_line(LineParser::AccessLog) do |record|
+      @alf.each_parsed_line do |record|
         records << record
       end
 

@@ -41,13 +41,13 @@ module LogfileInterval
   end
 
   class Logfile
-    def initialize(filename)
+    def initialize(filename, parser)
     end
 
     def each_line
     end
 
-    def each_parsed_line(parser)
+    def each_parsed_line
       each_line do |line|
         record = parser.create_record(line)
         yield record if record
@@ -56,7 +56,7 @@ module LogfileInterval
   end
 
   class LogfileSet
-    def initialize(parser, filenames_array)
+    def initialize(filenames_array, parser)
     end
 
     def ordered_filenams
@@ -131,7 +131,9 @@ end
 logfiles = [ 'access.log', 'access.log.1', 'access.log.2' ]
 logfile = logfiles.first
 
-logfile_iterator = LogfileInterval::Logfile.new(logfile)
+parser = LineParser::AccessLog
+
+logfile_iterator = LogfileInterval::Logfile.new(logfile, parser)
 logfile_iterator.each_line do |line|
   puts line.class # String
   puts line

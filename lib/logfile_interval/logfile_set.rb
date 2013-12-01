@@ -1,7 +1,7 @@
 module LogfileInterval
   class LogfileSet
     attr_reader :parser
-    
+
     def initialize(filenames, parser)
       @parser    = parser
       @filenames = filenames
@@ -13,8 +13,8 @@ module LogfileInterval
 
     def ordered_filenames
       time_for_file = existing_filenames.inject({}) do |h, filename|
-        file = Logfile.new(filename)
-        h[filename] = file.first_timestamp(@parser)
+        file = Logfile.new(filename, parser)
+        h[filename] = file.first_timestamp
         h
       end
       time_for_file.to_a.sort_by { |arr| arr[1] }.map { |arr| arr[0] }.reverse
@@ -22,8 +22,8 @@ module LogfileInterval
 
     def each_parsed_line
       ordered_filenames.each do |filename|
-        tfile = Logfile.new(filename)
-        tfile.each_parsed_line(@parser) do |record|
+        tfile = Logfile.new(filename, parser)
+        tfile.each_parsed_line do |record|
           yield record
         end
       end
@@ -31,7 +31,7 @@ module LogfileInterval
 
     def each_line
       ordered_filenames.each do |filename|
-        tfile = Logfile.new(filename)
+        tfile = Logfile.new(filename, parser)
         tfile.each_line do |line|
           yield line
         end

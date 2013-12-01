@@ -1,10 +1,13 @@
 module LogfileInterval
   class Logfile
-    def initialize(filename)
+    attr_reader :filename, :parser
+
+    def initialize(filename, parser)
       @filename = filename
+      @parser   = parser
     end
 
-    def first_timestamp(parser)
+    def first_timestamp
       return nil unless File.exist?(@filename)
       File.open(@filename) do |f|
         line = parser.create_record(f.gets)
@@ -20,7 +23,7 @@ module LogfileInterval
       f.close
     end
 
-    def each_parsed_line(parser)
+    def each_parsed_line
       each_line do |line|
         record = parser.create_record(line)
         yield record if record
