@@ -17,20 +17,13 @@ module LogfileInterval
 
       @data = {}
       parser.columns.each do |name, options|
-        case options[:agg_function]
-        when :sum       then @data[name] = 0
-        when :average   then @data[name] = 0
-        when :group     then @data[name] = Counter.new
-        end
+        next unless options[:aggregator]
+        @data[name] = options[:aggregator].new
       end
     end
 
     def [](name)
-      case parser.columns[name][:agg_function]
-      when :sum       then @data[name]
-      when :average   then size>0 ? @data[name].to_f / size.to_f : 0.0
-      when :group     then @data[name]
-      end
+      @data[name].value
     end
 
     def add_record(record)
@@ -42,11 +35,8 @@ module LogfileInterval
       @size += 1
 
       parser.columns.each do |name, options|
-        case options[:agg_function]
-        when :sum       then @data[name] += record[name]
-        when :average   then @data[name] += record[name]
-        when :group     then @data[name].increment(record[name])
-        end
+        next unless @data[name]
+        @data[name].add(record[name])
       end
     end
 

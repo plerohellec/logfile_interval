@@ -35,7 +35,11 @@ module LogfileInterval
         end
 
         def value
-          @val.to_f / @size.to_f
+          if @size > 0
+            @val.to_f / @size.to_f
+          else
+            0
+          end
         end
       end
 

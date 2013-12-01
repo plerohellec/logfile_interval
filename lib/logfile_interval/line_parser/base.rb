@@ -26,7 +26,8 @@ module LogfileInterval
             raise ArgumentError, "agg_function must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
           end
 
-          columns[name] = { :pos => pos, :agg_function => agg_function, :conversion => conversion }
+          aggregator = Aggregator.klass(agg_function)
+          columns[name] = { :pos => pos, :aggregator => aggregator, :conversion => conversion }
 
           define_method(name) do
             @data[name]
