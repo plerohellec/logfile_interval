@@ -6,25 +6,19 @@ module LogfileInterval
         end
 
         def add_column(name, options)
+          aggregator = Aggregators.klass(agg_function)
+          @columns[name] = { :pos => pos, :agg_function => aggregator, :conversion => conversion }
           define_method(name)
         end
 
         def parse(line)
-          @data = {}
           match_data = regex.match(line)
-          columns.each do |name, options|
-            val = match_data[options[:pos]]
-            @data[name] = convert(val, options[:conversion])
-          end
-          @data
+          @data = f(match_data)
         end
 
         def create_record(line)
           record = new(line)
           return record.valid? ? record : nil
-        end
-
-        def convert(val, conversion)
         end
       end
 
@@ -36,6 +30,38 @@ module LogfileInterval
 
       def initialize(line)
         @data = self.class.parse(line)
+      end
+    end
+
+    module Aggregator
+      def self.klass(agg_function)
+        case agg_function
+        when :sum then Sum
+        end
+      end
+
+      class Sum
+        def initialize
+          @val = 0
+        end
+
+        def add(value)
+          @val += value
+        end
+
+        def value
+          @val
+        end
+      end
+
+      class Group
+        def initialize
+          @val = Counter.new
+        end
+
+        def add(value)
+          @val.increment(value)
+        end
       end
     end
   end
@@ -140,7 +166,7 @@ logfile_iterator.each_line do |line|
 end
 
 parser = LineParser::AccessLog
-logfile_iterator.each_parsed_line(parser) do |record|
+logfile_iterator.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
   puts record.ip
   puts record.time

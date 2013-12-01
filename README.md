@@ -47,26 +47,26 @@ And get a parsed record for each line.
 logfile = 'access.log'
 parser = LineParser::AccessLog
 
-logfile_iterator = LogfileInterval::Logfile.new(logfile, parser)
-logfile_iterator.each_line do |line|
+log = LogfileInterval::Logfile.new(logfile, parser)
+log.each_line do |line|
   puts line.class # String
   puts line
 end
 
 parser = LineParser::AccessLog
-logfile_iterator.each_parsed_line(parser) do |record|
+log.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
   puts record.ip
   puts record.time
 end
 ```
 
-### Iterate through lins of multiples files
+### Iterate through lines of multiples files
 And get a parsed record for each line.
 ```ruby
 logfiles = [ 'access.log', 'access.log.1', 'access.log.2' ]
-set_iterator = LogfileInterval::LogfileSet.new(logfiles, parser)
-set_iterator.each_parsed_line do |record|
+set = LogfileInterval::LogfileSet.new(logfiles, parser)
+set.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
 end
 ```
