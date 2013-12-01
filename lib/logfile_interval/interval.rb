@@ -4,7 +4,6 @@ module LogfileInterval
     attr_reader   :size
 
     class OutOfRange < StandardError; end
-    class BadLength  < StandardError; end
     class ParserMismatch < StandardError; end
 
     def initialize(end_time, length, parser)
@@ -17,8 +16,8 @@ module LogfileInterval
 
       @data = {}
       parser.columns.each do |name, options|
-        next unless options[:aggregator]
-        @data[name] = options[:aggregator].new
+        next unless agg = options[:aggregator]
+        @data[name] = agg.new
       end
     end
 
@@ -38,10 +37,6 @@ module LogfileInterval
         next unless @data[name]
         @data[name].add(record[name])
       end
-    end
-
-    def ==(i)
-      self.end_time == i.end_time && self.length == i.length && self.size == i.size
     end
   end
 end
