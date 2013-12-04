@@ -8,6 +8,7 @@ module LogfileInterval
           Aggregator.klass(:sum).should == Sum
           Aggregator.klass(:average).should == Average
           Aggregator.klass(:group).should == Group
+          Aggregator.klass(:delta).should == Delta
         end
       end
 
@@ -26,6 +27,16 @@ module LogfileInterval
           sum.add(3)
           sum.add(5)
           sum.value.should == 4
+        end
+      end
+
+      describe Delta do
+        it 'averages delta values' do
+          sum = Delta.new
+          sum.add(1.4)
+          sum.add(1.1)
+          sum.add(1.0)
+          sum.value.round(5).should == 0.2
         end
       end
 

@@ -12,32 +12,32 @@ module LogfileInterval
 
       class Sum
         def initialize
-          @val = 0
+          @val = Counter.new
         end
 
         def add(value)
-          @val += value
+          @val.add(:all, value)
         end
 
         def value
-          @val
+          @val[:all]
         end
       end
 
       class Average
         def initialize
-          @val  = 0
+          @val  = Counter.new
           @size = 0
         end
 
         def add(value)
-          @val += value
+          @val.add(:all, value)
           @size += 1
         end
 
         def value
           if @size > 0
-            @val.to_f / @size.to_f
+            @val[:all].to_f / @size.to_f
           else
             0
           end
@@ -60,13 +60,13 @@ module LogfileInterval
 
       class Delta
         def initialize
-          @val = 0
+          @val = Counter.new
           @size = 0
         end
 
         def add(value)
           if @previous
-            @val += @previous - value
+            @val.add(:all, @previous - value)
             @size += 1
           end
           @previous = value
@@ -74,7 +74,7 @@ module LogfileInterval
 
         def value
           if @size > 0
-            @val.to_f / @size.to_f
+            @val[:all].to_f / @size.to_f
           else
             0
           end
