@@ -66,7 +66,7 @@ module LogfileInterval
     describe TimingLog do
       before :each do
         # 1385942400 = 2013/12/01 16:00:00
-        @line = '1385942400, posts#index, 100, 20000'
+        @line = '1385942400, posts#index, 100, 20000, 50.00'
       end
 
       it 'parses a timing line' do
@@ -76,6 +76,7 @@ module LogfileInterval
         record.action.should == 'posts#index'
         record.total_time.should == 100
         record.num_bytes.should == 20000
+        record.rss.should == 50.0
       end
     end
   end

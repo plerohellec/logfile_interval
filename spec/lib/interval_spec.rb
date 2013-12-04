@@ -22,17 +22,17 @@ module LogfileInterval
       end
 
       it 'rejects record out of interval' do
-        oor_record = LineParser::TimingLog.create_record('1385942450, posts#index, 100, 20000')
+        oor_record = LineParser::TimingLog.create_record('1385942450, posts#index, 100, 20000, 50.0')
         lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
       end
 
       it 'rejects record at interval start_time' do
-        oor_record = LineParser::TimingLog.create_record('1385942100, posts#index, 100, 20000')
+        oor_record = LineParser::TimingLog.create_record('1385942100, posts#index, 100, 20000, 50.0')
         lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
       end
 
       it 'adds 1 record to interval' do
-        record1 = LineParser::TimingLog.create_record('1385942400, posts#index, 100, 20000')
+        record1 = LineParser::TimingLog.create_record('1385942400, posts#index, 100, 20000, 50.0')
         @interval.add_record(record1)
 
         @interval.size.should == 1
@@ -43,11 +43,11 @@ module LogfileInterval
 
       context '3 records' do
         before :each do
-          record1 = LineParser::TimingLog.create_record('1385942400, posts#index, 100, 20000')
+          record1 = LineParser::TimingLog.create_record('1385942400, posts#index, 100, 20000, 53.0')
           @interval.add_record(record1)
-          record2 = LineParser::TimingLog.create_record('1385942300, posts#show, 50, 10000')
+          record2 = LineParser::TimingLog.create_record('1385942300, posts#show, 50, 10000, 51.0')
           @interval.add_record(record2)
-          record3 = LineParser::TimingLog.create_record('1385942200, posts#show, 60, 12000')
+          record3 = LineParser::TimingLog.create_record('1385942200, posts#show, 60, 12000, 50.0')
           @interval.add_record(record3)
         end
 
@@ -61,6 +61,10 @@ module LogfileInterval
 
         it 'sums up columns with sum agg_function' do
           @interval[:num_bytes].should == 42000
+        end
+
+        it 'avergaes the delta columns with delta agg_function' do
+          @interval[:rss].should == 1.5
         end
 
         it 'groups and counts columns with group agg_function' do

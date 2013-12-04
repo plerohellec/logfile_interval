@@ -6,6 +6,7 @@ module LogfileInterval
         when :sum     then Sum
         when :average then Average
         when :group   then Group
+        when :delta   then Delta
         end
       end
 
@@ -54,6 +55,29 @@ module LogfileInterval
 
         def value
           @val
+        end
+      end
+
+      class Delta
+        def initialize
+          @val = 0
+          @size = 0
+        end
+
+        def add(value)
+          if @previous
+            @val += @previous - value
+            @size += 1
+          end
+          @previous = value
+        end
+
+        def value
+          if @size > 0
+            @val.to_f / @size.to_f
+          else
+            0
+          end
         end
       end
     end
