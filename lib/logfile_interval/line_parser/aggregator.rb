@@ -18,10 +18,6 @@ module LogfileInterval
           @size = Counter.new
         end
 
-        def key(group_by = nil)
-          group_by ? group_by : :all
-        end
-
         def value(group = nil)
           average(key(group))
         end
@@ -35,6 +31,10 @@ module LogfileInterval
         end
 
         private
+        def key(group_by = nil)
+          group_by ? group_by : :all
+        end
+
         def single_value?
           return true if @val.empty?
           @val.keys.count == 1 && @val.keys.first == :all
@@ -47,18 +47,14 @@ module LogfileInterval
         end
 
         def average(k)
-          if @size[k] > 0
-            @val[k].to_f / @size[k].to_f
-          else
-            0
-          end
+          @size[k] > 0 ? @val[k].to_f / @size[k].to_f : 0
         end
       end
 
       class Sum < Base
         def add(value, group_by = nil)
           @val.add(key(group_by), value)
-          @size.set(key, 1)
+          @size.set(key(group_by), 1)
         end
       end
 
