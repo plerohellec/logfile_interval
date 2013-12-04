@@ -10,46 +10,52 @@ module LogfileInterval
         end
       end
 
-      class Sum
+      class Base
+        def key(group_by = nil)
+          group_by ? group_by : :all
+        end
+      end
+
+      class Sum < Base
         def initialize
           @val = Counter.new
         end
 
-        def add(value)
-          @val.add(:all, value)
+        def add(value, group_by = nil)
+          @val.add(key(group_by), value)
         end
 
-        def value
-          @val[:all]
+        def value(group = nil)
+          @val[key(group)]
         end
       end
 
-      class Average
+      class Average < Base
         def initialize
           @val  = Counter.new
-          @size = 0
+          @size = Counter.new
         end
 
-        def add(value)
-          @val.add(:all, value)
-          @size += 1
+        def add(value, group_by = nil)
+          @val.add(key(group_by), value)
+          @size.increment(key(group_by))
         end
 
-        def value
-          if @size > 0
-            @val[:all].to_f / @size.to_f
+        def value(group = nil)
+          if @size[key(group)] > 0
+            @val[key(group)].to_f / @size[key(group)].to_f
           else
             0
           end
         end
       end
 
-      class Group
+      class Group < Base
         def initialize
           @val = Counter.new
         end
 
-        def add(value)
+        def add(value, group_by = nil)
           @val.increment(value)
         end
 
@@ -58,23 +64,23 @@ module LogfileInterval
         end
       end
 
-      class Delta
+      class Delta < Base
         def initialize
           @val = Counter.new
-          @size = 0
+          @size = Counter.new
         end
 
-        def add(value)
+        def add(value, group_by = nil)
           if @previous
-            @val.add(:all, @previous - value)
-            @size += 1
+            @val.add(key(group_by), @previous - value)
+            @size.increment(key(group_by))
           end
           @previous = value
         end
 
-        def value
-          if @size > 0
-            @val[:all].to_f / @size.to_f
+        def value(group = nil)
+          if @size[key(group)] > 0
+            @val[key(group)].to_f / @size[key(group)].to_f
           else
             0
           end
