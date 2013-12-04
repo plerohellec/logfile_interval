@@ -17,6 +17,10 @@ module LogfileInterval
         end
       end
 
+      def set(key, num)
+        self[key] = num
+      end
+
       def [](key)
         self.fetch(key, 0)
       end

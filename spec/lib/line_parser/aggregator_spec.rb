@@ -47,10 +47,10 @@ module LogfileInterval
           g.add('500')
           g.add('301')
           g.add('200')
-          g.value.should be_a(Hash)
-          g.value.should include({'200' => 2})
-          g.value.should include({'301' => 1})
-          g.value.should include({'500' => 1})
+          g.values.should be_a(Hash)
+          g.values.should include({'200' => 2})
+          g.values.should include({'301' => 1})
+          g.values.should include({'500' => 1})
         end
       end
     end

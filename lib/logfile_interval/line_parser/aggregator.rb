@@ -11,79 +11,78 @@ module LogfileInterval
       end
 
       class Base
-        def key(group_by = nil)
-          group_by ? group_by : :all
-        end
-      end
+        include Enumerable
 
-      class Sum < Base
         def initialize
           @val = Counter.new
-        end
-
-        def add(value, group_by = nil)
-          @val.add(key(group_by), value)
-        end
-
-        def value(group = nil)
-          @val[key(group)]
-        end
-      end
-
-      class Average < Base
-        def initialize
-          @val  = Counter.new
           @size = Counter.new
         end
 
-        def add(value, group_by = nil)
-          @val.add(key(group_by), value)
-          @size.increment(key(group_by))
+        def key(group_by = nil)
+          group_by ? group_by : :all
         end
 
         def value(group = nil)
-          if @size[key(group)] > 0
-            @val[key(group)].to_f / @size[key(group)].to_f
+          average(key(group))
+        end
+
+        def values
+          if single_value?
+            value
+          else
+            self.inject({}) { |h, v| h[v[0]] = v[1]; h }
+          end
+        end
+
+        private
+        def single_value?
+          return true if @val.empty?
+          @val.keys.count == 1 && @val.keys.first == :all
+        end
+
+        def each
+          @val.each_key do |k|
+            yield k, average(k)
+          end
+        end
+
+        def average(k)
+          if @size[k] > 0
+            @val[k].to_f / @size[k].to_f
           else
             0
           end
         end
       end
 
-      class Group < Base
-        def initialize
-          @val = Counter.new
+      class Sum < Base
+        def add(value, group_by = nil)
+          @val.add(key(group_by), value)
+          @size.set(key, 1)
         end
+      end
 
+      class Average < Base
+        def add(value, group_by = nil)
+          @val.add(key(group_by), value)
+          @size.increment(key(group_by))
+        end
+      end
+
+      class Group < Base
         def add(value, group_by = nil)
           @val.increment(value)
-        end
-
-        def value
-          @val
+          @size.set(value, 1)
         end
       end
 
       class Delta < Base
-        def initialize
-          @val = Counter.new
-          @size = Counter.new
-        end
-
         def add(value, group_by = nil)
           if @previous
             @val.add(key(group_by), @previous - value)
             @size.increment(key(group_by))
           end
           @previous = value
-        end
-
-        def value(group = nil)
-          if @size[key(group)] > 0
-            @val[key(group)].to_f / @size[key(group)].to_f
-          else
-            0
-          end
         end
       end
     end

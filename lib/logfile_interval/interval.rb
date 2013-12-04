@@ -22,7 +22,7 @@ module LogfileInterval
     end
 
     def [](name)
-      @data[name].value
+      @data[name].values
     end
 
     def add_record(record)
