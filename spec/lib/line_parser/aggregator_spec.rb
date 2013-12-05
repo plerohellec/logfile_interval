@@ -128,16 +128,16 @@ module LogfileInterval
 
         describe Average do
           it 'averages values by key' do
-            sum = Average.new
-            sum.add(3, :key1)
-            sum.add(5, :key2)
-            sum.add(5, :key1)
-            sum.values.should be_a(Hash)
-            sum.values.size.should == 2
-            sum.value(:key1).should == 4
-            sum.values[:key1].should == 4
-            sum.value(:key2).should == 5
-            sum.values[:key2].should == 5
+            avg = Average.new
+            avg.add(3, :key1)
+            avg.add(5, :key2)
+            avg.add(5, :key1)
+            avg.values.should be_a(Hash)
+            avg.values.size.should == 2
+            avg.value(:key1).should == 4
+            avg.values[:key1].should == 4
+            avg.value(:key2).should == 5
+            avg.values[:key2].should == 5
           end
         end
 

@@ -35,7 +35,8 @@ module LogfileInterval
 
       parser.columns.each do |name, options|
         next unless @data[name]
-        @data[name].add(record[name])
+        group_by_value = record[options[:group_by]] if options[:group_by]
+        @data[name].add(record[name], group_by_value)
       end
     end
   end
