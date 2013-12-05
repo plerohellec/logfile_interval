@@ -12,48 +12,6 @@ module LogfileInterval
         end
       end
 
-      describe Sum do
-        it 'sums up values' do
-          sum = Sum.new
-          sum.add(3)
-          sum.add(5)
-          sum.value.should == 8
-        end
-      end
-
-      describe Average do
-        it 'averages values' do
-          avg = Average.new
-          avg.add(3)
-          avg.add(5)
-          avg.value.should == 4
-        end
-      end
-
-      describe Delta do
-        it 'averages delta values' do
-          d = Delta.new
-          d.add(1.4)
-          d.add(1.1)
-          d.add(1.0)
-          d.value.round(5).should == 0.2
-        end
-      end
-
-      describe Group do
-        it 'groups values and increment counters' do
-          g = Group.new
-          g.add('200')
-          g.add('500')
-          g.add('301')
-          g.add('200')
-          g.values.should be_a(Hash)
-          g.values.should include({'200' => 2})
-          g.values.should include({'301' => 1})
-          g.values.should include({'500' => 1})
-        end
-      end
-
       shared_examples 'an aggregator' do
         let(:aggregator) { described_class.new }
 
@@ -99,11 +57,60 @@ module LogfileInterval
         end
       end
 
-      describe 'group_by' do
+      [ Group, Sum, Average, Delta ]. each do |klass|
+        describe klass do
+          it_behaves_like 'an aggregator'
+        end
+      end
+
+
+      describe 'without group_by key' do
+        describe Sum do
+          it 'sums up values' do
+            sum = Sum.new
+            sum.add(3)
+            sum.add(5)
+            sum.value.should == 8
+          end
+        end
+
+        describe Average do
+          it 'averages values' do
+            avg = Average.new
+            avg.add(3)
+            avg.add(5)
+            avg.value.should == 4
+          end
+        end
+
+        describe Delta do
+          it 'averages delta values' do
+            d = Delta.new
+            d.add(1.4)
+            d.add(1.1)
+            d.add(1.0)
+            d.value.round(5).should == 0.2
+          end
+        end
+
+        describe Group do
+          it 'groups values and increment counters' do
+            g = Group.new
+            g.add('200')
+            g.add('500')
+            g.add('301')
+            g.add('200')
+            g.values.should be_a(Hash)
+            g.values.should include({'200' => 2})
+            g.values.should include({'301' => 1})
+            g.values.should include({'500' => 1})
+          end
+        end
+      end
+
+      describe 'with group_by key' do
 
         describe Sum do
-          it_behaves_like 'an aggregator'
-
           it 'sums up values by key' do
             sum = Sum.new
             sum.add(3, :key1)
@@ -120,8 +127,6 @@ module LogfileInterval
 
 
         describe Average do
-          it_behaves_like 'an aggregator'
-
           it 'averages values by key' do
             sum = Average.new
             sum.add(3, :key1)
@@ -137,12 +142,9 @@ module LogfileInterval
         end
 
         describe Group do
-          it_behaves_like 'an aggregator'
         end
 
         describe Delta do
-          it_behaves_like 'an aggregator'
-
           it 'averages deltas by key' do
             d = Delta.new
             d.add(9, :key1)
