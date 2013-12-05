@@ -23,20 +23,20 @@ module LogfileInterval
 
       describe Average do
         it 'averages values' do
-          sum = Average.new
-          sum.add(3)
-          sum.add(5)
-          sum.value.should == 4
+          avg = Average.new
+          avg.add(3)
+          avg.add(5)
+          avg.value.should == 4
         end
       end
 
       describe Delta do
         it 'averages delta values' do
-          sum = Delta.new
-          sum.add(1.4)
-          sum.add(1.1)
-          sum.add(1.0)
-          sum.value.round(5).should == 0.2
+          d = Delta.new
+          d.add(1.4)
+          d.add(1.1)
+          d.add(1.0)
+          d.value.round(5).should == 0.2
         end
       end
 
@@ -52,6 +52,114 @@ module LogfileInterval
           g.values.should include({'301' => 1})
           g.values.should include({'500' => 1})
         end
+      end
+
+      shared_examples 'an aggregator' do
+        let(:aggregator) { described_class.new }
+
+        [ :add, :value, :values ].each do |method|
+          it "responds to #{method}" do
+            aggregator.should respond_to(method)
+          end
+        end
+
+        context 'values' do
+          context 'with one group' do
+            before :each do
+              aggregator.add(5, :key1)
+            end
+
+            it 'returns a hash' do
+              aggregator.values.should be_a(Hash) unless aggregator.is_a?(Delta)
+            end
+          end
+
+          context 'with several groups' do
+            before :each do
+              aggregator.add(5, :key1)
+              aggregator.add(3, :key2)
+              aggregator.add(3, :key1)
+            end
+
+            it 'returns a hash' do
+              aggregator.values.should be_a(Hash)
+            end
+          end
+
+          context 'with no group' do
+            before :each do
+              aggregator.add(5)
+              aggregator.add(3)
+            end
+
+            it 'returns a numeric' do
+              aggregator.values.should be_a(Numeric) unless aggregator.is_a?(Group)
+            end
+          end
+        end
+      end
+
+      describe 'group_by' do
+
+        describe Sum do
+          it_behaves_like 'an aggregator'
+
+          it 'sums up values by key' do
+            sum = Sum.new
+            sum.add(3, :key1)
+            sum.add(5, :key2)
+            sum.add(5, :key1)
+            sum.values.should be_a(Hash)
+            sum.values.size.should == 2
+            sum.value(:key1).should == 8
+            sum.values[:key1].should == 8
+            sum.value(:key2).should == 5
+            sum.values[:key2].should == 5
+          end
+        end
+
+
+        describe Average do
+          it_behaves_like 'an aggregator'
+
+          it 'averages values by key' do
+            sum = Average.new
+            sum.add(3, :key1)
+            sum.add(5, :key2)
+            sum.add(5, :key1)
+            sum.values.should be_a(Hash)
+            sum.values.size.should == 2
+            sum.value(:key1).should == 4
+            sum.values[:key1].should == 4
+            sum.value(:key2).should == 5
+            sum.values[:key2].should == 5
+          end
+        end
+
+        describe Group do
+          it_behaves_like 'an aggregator'
+        end
+
+        describe Delta do
+          it_behaves_like 'an aggregator'
+
+          it 'averages deltas by key' do
+            d = Delta.new
+            d.add(9, :key1)
+            d.add(10, :key2)
+            d.add(5, :key1)
+            d.add(8, :key2)
+            d.add(3, :key1)
+            d.add(5, :key2)
+            d.values.should be_a(Hash)
+            d.values.size.should == 2
+            d.value(:key1).should == 3
+            d.values[:key1].should == 3
+            d.value(:key2).should == 2.5
+            d.values[:key2].should == 2.5
+          end
+        end
+
       end
     end
   end
