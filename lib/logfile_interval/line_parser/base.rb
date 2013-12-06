@@ -6,6 +6,8 @@ module LogfileInterval
     class ConfigurationError  < StandardError; end
 
     class Base
+      attr_reader :data
+      
       class << self
         attr_reader :regex
 
