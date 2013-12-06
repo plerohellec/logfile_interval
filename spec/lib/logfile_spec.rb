@@ -32,8 +32,12 @@ module LogfileInterval
 
       records.first.time.should == Time.new(2012, 01, 01, 16, 30, 51, '-08:00')
       records.first.code.should == '200'
+      records.first.length.should == 6801
+      records.first.length_by_ip.should == 6801
       records.last.time.should  == Time.new(2012, 01, 01, 00, 57, 47, '-08:00')
       records.last.code.should == '301'
+      records.last.length.should == 185
+      records.last.length_by_ip.should == 185
     end
   end
 end
