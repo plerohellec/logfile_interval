@@ -10,8 +10,11 @@ module LogfileInterval
     def first_timestamp
       return nil unless File.exist?(@filename)
       File.open(@filename) do |f|
-        line = parser.create_record(f.gets)
-        line.time
+        while line = f.gets
+          if record = parser.create_record(line)
+            return record.time
+          end
+        end
       end
     end
 
