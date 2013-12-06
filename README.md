@@ -82,6 +82,7 @@ log.each_parsed_line do |record|
   puts record.length
 end
 ```
+Note: the Logfile iterators always start with the last line in the file and works its way backward.
 
 ### Iterate through lines of multiples files
 And get a parsed record for each line.
@@ -92,6 +93,8 @@ set.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
 end
 ```
+Note: the LogfileSet iterators always starts with the most recent file.
+
 ### Aggregate lines into intervals
 ```ruby
 length = 5.minutes
@@ -108,7 +111,6 @@ interval_builder.each_interval do |interval|
   end
 end
 ```
-
 
 ## Contributing
 
