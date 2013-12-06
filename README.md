@@ -53,11 +53,11 @@ Attributes of a column:
 * name: a parsed record will have a method with that name returning the value found at that position
 * pos:  the position of the captured field in the regex matched data
 * agg_function : the aggregation mode for this field
-** timestamp: the timestamp field will be used to determine to which interval the line belongs, each line MUST have a timestamp
-** group: the aggregator will count the number of occurence of each value of this field
-** average: the aggregator will calculate the average value of this field
-** sum: the aggregator will add up the values of this field
-** delta: the aggregator will caclculate the difference between each line and the next and will average all the deltas
+ * timestamp: the timestamp field will be used to determine to which interval the line belongs, each line MUST have a timestamp
+ * group: the aggregator will count the number of occurence of each value of this field
+ * average: the aggregator will calculate the average value of this field
+ * sum: the aggregator will add up the values of this field
+ * delta: the aggregator will caclculate the difference between each line and the next and will average all the deltas
 * conversion: the parser will convert the field to an interger or a float when building the parsed record
 * group_by: group_by value is the name of another field. The aggregator will apply the agg_function to this field for each distinct value found in the other field.
 
@@ -82,7 +82,7 @@ log.each_parsed_line do |record|
   puts record.length
 end
 ```
-Note: the Logfile iterators always start with the last line in the file and works its way backward.
+**Note**: the Logfile iterators always start with the last line in the file and works its way backward.
 
 ### Iterate through lines of multiples files
 And get a parsed record for each line.
@@ -93,7 +93,7 @@ set.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
 end
 ```
-Note: the LogfileSet iterators always starts with the most recent file.
+**Note**: the LogfileSet iterators always starts with the most recent file.
 
 ### Aggregate lines into intervals
 ```ruby
