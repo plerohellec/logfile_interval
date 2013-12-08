@@ -5,7 +5,7 @@ module LogfileInterval
         case agg_function
         when :sum     then Sum
         when :average then Average
-        when :group   then Group
+        when :count   then Count
         when :delta   then Delta
         end
       end
@@ -65,10 +65,10 @@ module LogfileInterval
         end
       end
 
-      class Group < Base
+      class Count < Base
         def add(value, group_by = nil)
-          @val.increment(value)
-          @size.set(value, 1)
+          @val.add(key(group_by), 1)
+          @size.set(key(group_by), 1)
         end
       end
 

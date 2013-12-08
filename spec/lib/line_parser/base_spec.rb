@@ -43,7 +43,7 @@ module LogfileInterval
 
     describe 'Broken parsers' do
       class NoRegexLog < Base
-        add_column :name => 'ip',        :pos => 1, :agg_function => :group
+        add_column :name => 'ip',        :pos => 1, :agg_function => :count
       end
 
       class NoColumnLog < Base

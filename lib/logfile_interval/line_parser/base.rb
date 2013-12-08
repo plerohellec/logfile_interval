@@ -1,13 +1,13 @@
 module LogfileInterval
   module LineParser
-    AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :group, :delta ]
+    AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :count, :delta ]
 
     class InvalidLine         < StandardError; end
     class ConfigurationError  < StandardError; end
 
     class Base
       attr_reader :data
-      
+
       class << self
         attr_reader :regex
 

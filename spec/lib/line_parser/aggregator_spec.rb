@@ -7,7 +7,7 @@ module LogfileInterval
         it 'finds the aggregator class' do
           Aggregator.klass(:sum).should == Sum
           Aggregator.klass(:average).should == Average
-          Aggregator.klass(:group).should == Group
+          Aggregator.klass(:count).should == Count
           Aggregator.klass(:delta).should == Delta
         end
       end
@@ -51,13 +51,13 @@ module LogfileInterval
             end
 
             it 'returns a numeric' do
-              aggregator.values.should be_a(Numeric) unless aggregator.is_a?(Group)
+              aggregator.values.should be_a(Numeric) unless aggregator.is_a?(Count)
             end
           end
         end
       end
 
-      [ Group, Sum, Average, Delta ]. each do |klass|
+      [ Count, Sum, Average, Delta ]. each do |klass|
         describe klass do
           it_behaves_like 'an aggregator'
         end
@@ -93,17 +93,14 @@ module LogfileInterval
           end
         end
 
-        describe Group do
+        describe Count do
           it 'groups values and increment counters' do
-            g = Group.new
+            g = Count.new
             g.add('200')
             g.add('500')
             g.add('301')
             g.add('200')
-            g.values.should be_a(Hash)
-            g.values.should include({'200' => 2})
-            g.values.should include({'301' => 1})
-            g.values.should include({'500' => 1})
+            g.value.should == 4
           end
         end
       end
@@ -141,7 +138,18 @@ module LogfileInterval
           end
         end
 
-        describe Group do
+        describe Count do
+          it 'groups values and increment counters' do
+            g = Count.new
+            g.add('200', '200')
+            g.add('500', '500')
+            g.add('301', '301')
+            g.add('200', '200')
+            g.values.should be_a(Hash)
+            g.values.should include({'200' => 2})
+            g.values.should include({'301' => 1})
+            g.values.should include({'500' => 1})
+          end
         end
 
         describe Delta do

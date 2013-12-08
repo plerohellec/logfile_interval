@@ -31,11 +31,11 @@ module LogfileInterval
 
       set_regex /^([\d\.]+)\s+\S+\s+\S+\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+(\d+)\s+"([^"]*)"\s+"([^"]+)"$/
 
-      add_column :name => 'ip',           :pos => 1, :agg_function => :group
+      add_column :name => 'ip',           :pos => 1, :agg_function => :count,     :group_by => 'ip'
       add_column :name => 'timestamp',    :pos => 2, :agg_function => :timestamp
-      add_column :name => 'code',         :pos => 4, :agg_function => :group
-      add_column :name => 'length',       :pos => 5, :agg_function => :average,   :conversion => :integer,
-      add_column :name => 'length_by_ip', :pos => 5, :agg_function => :average,   :conversion => :integer, :group_by => 'ip'
+      add_column :name => 'code',         :pos => 4, :agg_function => :count,     :group_by => 'code'
+      add_column :name => 'length',       :pos => 5, :agg_function => :average,                      :conversion => :integer,
+      add_column :name => 'length_by_ip', :pos => 5, :agg_function => :average,   :group_by => 'ip', :conversion => :integer
 
       def time
         Time.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z')

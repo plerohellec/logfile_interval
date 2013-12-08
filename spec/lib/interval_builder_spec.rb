@@ -30,9 +30,7 @@ module LogfileInterval
           @intervals.first[:total_time].should == 700.0/4
           @intervals.first[:num_bytes].should == 52000
           @intervals.first[:rss].round(5).should == 0.60
-          @intervals.first[:action]['posts#index'] = 1
-          @intervals.first[:action]['posts#create'] = 1
-          @intervals.first[:action]['posts#show'] = 2
+          @intervals.first[:action].should == 4
         end
       end
 
@@ -42,8 +40,7 @@ module LogfileInterval
           @intervals.last[:total_time].should == 300
           @intervals.last[:num_bytes].should == 41000
           @intervals.last[:rss].round(5).should == 0.20
-          @intervals.last[:action]['posts#index'] = 1
-          @intervals.last[:action]['posts#show'] = 1
+          @intervals.last[:action].should == 2
         end
       end
     end

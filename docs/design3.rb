@@ -54,7 +54,7 @@ module LogfileInterval
         end
       end
 
-      class Group
+      class Count
         def initialize
           @val = Counter.new
         end

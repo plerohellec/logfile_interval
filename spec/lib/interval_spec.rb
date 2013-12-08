@@ -42,7 +42,7 @@ module LogfileInterval
           @interval.size.should == 1
           @interval[:total_time].should == 100
           @interval[:num_bytes].should == 20000
-          @interval[:action]['posts#index'].should == 1
+          @interval[:action].should == 1
         end
       end
 
@@ -74,9 +74,8 @@ module LogfileInterval
           @interval[:rss].should == 1.5
         end
 
-        it 'groups and counts columns with group agg_function' do
-          @interval[:action]['posts#index'].should == 1
-          @interval[:action]['posts#show'].should == 2
+        it 'counts columns with group agg_function' do
+          @interval[:action].should == 3
         end
       end
 
@@ -94,9 +93,18 @@ module LogfileInterval
           @interval.add_record(record4)
         end
 
+        it 'count value column per group column' do
+          @interval[:action].should be_a(Hash)
+          @interval[:action].size.should == 2
+          @interval[:action]['posts#index'].should == 2
+          @interval[:action]['posts#show'].should  == 2
+        end
+
         it 'averages value column per group column' do
           @interval[:total_time].should be_a(Hash)
           @interval[:total_time].size.should == 2
+          @interval[:action]['posts#index'].should == 2
+          @interval[:action]['posts#show'].should  == 2
           @interval[:total_time]['posts#index'].should == 100
           @interval[:total_time]['posts#show'].should  == 55
         end
