@@ -1,4 +1,4 @@
-# LogfileInterval
+# LogfileInterval [![Build Status](https://travis-ci.org/plerohellec/logfile_interval.png?branch=master)](https://travis-ci.org/plerohellec/logfile_interval)
 
 Logfile parser and aggregator.
 
@@ -63,7 +63,7 @@ Attributes of a column:
  * average: the aggregator will calculate the average value of this field
  * sum: the aggregator will add up the values of this field
  * delta: the aggregator will caclculate the difference between each line and the next and will average all the deltas
-* conversion: the parser will convert the field to an interger or a float when building the parsed record
+* conversion: the parser will convert the field to an integer or a float when building the parsed record
 * group_by: group_by value is the name of another field. The aggregator will apply the agg_function to this field for each distinct value found in the other field.
 
 ### Iterate through lines of a single file
