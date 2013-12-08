@@ -66,7 +66,7 @@ module LogfileInterval
     describe TimingLog do
       before :each do
         # 1385942400 = 2013/12/01 16:00:00
-        @line = '1385942400, posts#index, 100, 20000, 50.00'
+        @line = '1385942400, 192.168.0.5, posts#index, 100, 20000, 50.00'
       end
 
       it 'parses a timing line' do

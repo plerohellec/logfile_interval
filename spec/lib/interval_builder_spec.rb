@@ -30,6 +30,7 @@ module LogfileInterval
           @intervals.first[:total_time].should == 700.0/4
           @intervals.first[:num_bytes].should == 52000
           @intervals.first[:rss].round(5).should == 0.60
+          @intervals.first[:ip].should == 4
           @intervals.first[:action].should == 4
         end
       end
@@ -40,6 +41,7 @@ module LogfileInterval
           @intervals.last[:total_time].should == 300
           @intervals.last[:num_bytes].should == 41000
           @intervals.last[:rss].round(5).should == 0.20
+          @intervals.last[:ip].should == 2
           @intervals.last[:action].should == 2
         end
       end

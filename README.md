@@ -34,6 +34,7 @@ module LogfileInterval
       add_column :name => 'ip',           :pos => 1, :agg_function => :count,     :group_by => 'ip'
       add_column :name => 'timestamp',    :pos => 2, :agg_function => :timestamp
       add_column :name => 'code',         :pos => 4, :agg_function => :count,     :group_by => 'code'
+      add_column :name => 'code_by_ip',   :pos => 4, :agg_function => :count,     :group_by => 'ip'
       add_column :name => 'length',       :pos => 5, :agg_function => :average,                      :conversion => :integer,
       add_column :name => 'length_by_ip', :pos => 5, :agg_function => :average,   :group_by => 'ip', :conversion => :integer
 
@@ -54,7 +55,11 @@ Attributes of a column:
 * pos:  the position of the captured field in the regex matched data
 * agg_function : the aggregation mode for this field
  * timestamp: the timestamp field will be used to determine to which interval the line belongs, each line MUST have a timestamp
- * group: the aggregator will count the number of occurence of each value of this field
+ * count: the aggregator will count the number of occurence of this field
+  * without the group_by option, it will just count the total number of lines (probably useless)
+  * with a group_by option pointing to the same field as the current one, it will count the number of occurence
+    per distinct value of this colun
+  * with a group_by option pointing to another field, it will count the number of occurences of (this field, other field) pairs.
  * average: the aggregator will calculate the average value of this field
  * sum: the aggregator will add up the values of this field
  * delta: the aggregator will caclculate the difference between each line and the next and will average all the deltas

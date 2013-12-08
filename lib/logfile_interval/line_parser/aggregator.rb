@@ -3,10 +3,11 @@ module LogfileInterval
     module Aggregator
       def self.klass(agg_function)
         case agg_function
-        when :sum     then Sum
-        when :average then Average
-        when :count   then Count
-        when :delta   then Delta
+        when :sum               then Sum
+        when :average           then Average
+        when :count             then Count
+        when :group_and_count   then GroupAndCount
+        when :delta             then Delta
         end
       end
 
@@ -28,6 +29,10 @@ module LogfileInterval
           else
             self.inject({}) { |h, v| h[v[0]] = v[1]; h }
           end
+        end
+
+        def add(value, group_by = nil)
+          raise NotImplementedError
         end
 
         private
@@ -68,6 +73,18 @@ module LogfileInterval
       class Count < Base
         def add(value, group_by = nil)
           @val.add(key(group_by), 1)
+          @size.set(key(group_by), 1)
+        end
+      end
+
+      class GroupAndCount < Base
+        def each
+          @val.each { |k, v| yield k, v }
+        end
+
+        def add(value, group_by)
+          raise ArgumentError, 'group_by argument is mandatory for GroupAndCount#add' unless group_by
+          @val.increment_subkey(value, key(group_by))
           @size.set(key(group_by), 1)
         end
       end

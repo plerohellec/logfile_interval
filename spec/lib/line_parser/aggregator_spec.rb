@@ -8,6 +8,7 @@ module LogfileInterval
           Aggregator.klass(:sum).should == Sum
           Aggregator.klass(:average).should == Average
           Aggregator.klass(:count).should == Count
+          Aggregator.klass(:group_and_count).should == GroupAndCount
           Aggregator.klass(:delta).should == Delta
         end
       end
@@ -149,6 +150,40 @@ module LogfileInterval
             g.values.should include({'200' => 2})
             g.values.should include({'301' => 1})
             g.values.should include({'500' => 1})
+          end
+        end
+
+        describe GroupAndCount do
+          it 'each yields a key and a hash' do
+            gac = GroupAndCount.new
+            gac.add :key1, :subkey1
+            gac.first.should be_an(Array)
+            gac.first.size.should == 2
+            gac.first[1].should be_a(Hash)
+          end
+
+          context :add do
+            before :each do
+              @gac = GroupAndCount.new
+            end
+
+            it 'requires a group_by argument' do
+              lambda { @gac.add('foo') }.should raise_error ArgumentError
+            end
+
+            it 'counts number of occurence of subkey for key' do
+              @gac.add :key1, :subkey1
+              @gac.add :key1, :subkey2
+              @gac.add :key2, :subkey1
+              @gac.add :key2, :subkey1
+              @gac.add :key2, :subkey3
+
+              @gac.values[:key1][:subkey1].should == 1
+              @gac.values[:key1][:subkey2].should == 1
+              @gac.values[:key2][:subkey1].should == 2
+              @gac.values[:key2][:subkey2].should == 0
+              @gac.values[:key2][:subkey3].should == 1
+            end
           end
         end
 
