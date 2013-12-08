@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = LogfileInterval::VERSION
   spec.authors       = ["Philippe Le Rohellec"]
   spec.email         = ["philippe@lerohellec.com"]
-  spec.description   = %q{Logfile parser and aggregator}
-  spec.summary       = %q{Aggregate logfile data into intervals}
-  spec.homepage      = ""
+  spec.description   = "Logfile parser and aggregator"
+  spec.summary       = "Aggregate logfile data into intervals"
+  spec.homepage      = "https://github.com/plerohellec/logfile_interval"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency(%q<debugger>, [">= 0"])
-  spec.add_development_dependency(%q<rspec>, ["~> 2.14.0"])
+  spec.add_development_dependency "debugger", [">= 0"]
+  spec.add_development_dependency "rspec", ["~> 2.14.0"]
   spec.add_development_dependency "rake"
   spec.add_development_dependency "simplecov"
 end
