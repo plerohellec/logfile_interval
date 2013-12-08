@@ -6,8 +6,8 @@ module LogfileInterval
         end
 
         def add_column(name, options)
-          aggregator = Aggregators.klass(agg_function)
-          @columns[name] = { :pos => pos, :agg_function => aggregator, :conversion => conversion }
+          agg = Aggregators.klass(aggregator)
+          @columns[name] = { :pos => pos, :aggregator => agg, :conversion => conversion }
           define_method(name)
         end
 
@@ -26,7 +26,7 @@ module LogfileInterval
 
     class AccessLog < Base
       set_regex /blah/
-      add_column :name => :foo, :pos => 1, :conversion => integer, :agg_function => :average
+      add_column :name => :foo, :pos => 1, :conversion => integer, :aggregator => :average
 
       def initialize(line)
         @data = self.class.parse(line)
@@ -34,8 +34,8 @@ module LogfileInterval
     end
 
     module Aggregator
-      def self.klass(agg_function)
-        case agg_function
+      def self.klass(aggregator)
+        case aggregator
         when :sum then Sum
         end
       end

@@ -1,8 +1,8 @@
 module LogfileInterval
   module LineParser
     module Aggregator
-      def self.klass(agg_function)
-        case agg_function
+      def self.klass(aggregator)
+        case aggregator
         when :sum               then Sum
         when :average           then Average
         when :count             then Count

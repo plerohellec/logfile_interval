@@ -22,17 +22,17 @@ module LogfileInterval
         def add_column(options)
           name          = options.fetch(:name)
           pos           = options.fetch(:pos)
-          agg_function  = options.fetch(:agg_function)
+          aggregator  = options.fetch(:aggregator)
           conversion    = options.fetch(:conversion, :string)
-          unless AGGREGATION_FUNCTIONS.include?(agg_function)
-            raise ArgumentError, "agg_function must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
+          unless AGGREGATION_FUNCTIONS.include?(aggregator)
+            raise ArgumentError, "aggregator must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
           end
 
-          if agg_function == :count && options[:group_by] && options[:group_by] != name
-            agg_function = :group_and_count
+          if aggregator == :count && options[:group_by] && options[:group_by] != name
+            aggregator = :group_and_count
           end
 
-          aggregator = Aggregator.klass(agg_function)
+          aggregator = Aggregator.klass(aggregator)
           columns[name] = { :pos => pos, :aggregator => aggregator, :conversion => conversion }
           columns[name][:group_by] = options[:group_by]
 

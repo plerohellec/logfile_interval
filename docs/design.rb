@@ -40,7 +40,7 @@ module LogfileInterval
 
     class AccessLog < Base
       set_regex /blah/
-      add_column :name => :foo, :pos => 1, :conversion => integer, :agg_function => :average
+      add_column :name => :foo, :pos => 1, :conversion => integer, :aggregator => :average
 
     end
   end

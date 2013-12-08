@@ -78,19 +78,19 @@ module LogfileInterval
           @interval.size.should == 3
         end
 
-        it 'averages columns with average agg_function' do
+        it 'averages columns with average aggregator' do
           @interval[:total_time].should == 70
         end
 
-        it 'sums up columns with sum agg_function' do
+        it 'sums up columns with sum aggregator' do
           @interval[:num_bytes].should == 42000
         end
 
-        it 'averages the delta columns with delta agg_function' do
+        it 'averages the delta columns with delta aggregator' do
           @interval[:rss].should == 1.5
         end
 
-        it 'counts columns with group agg_function' do
+        it 'counts columns with group aggregator' do
           @interval[:ip].should == 3
           @interval[:action].should == 3
         end
