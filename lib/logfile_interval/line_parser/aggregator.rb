@@ -20,7 +20,7 @@ module LogfileInterval
         end
 
         def value(group = nil)
-          average(key(group))
+          val(key(group))
         end
 
         def values
@@ -47,8 +47,12 @@ module LogfileInterval
 
         def each
           @val.each_key do |k|
-            yield k, average(k)
+            yield k, val(k)
           end
+        end
+
+        def val(k)
+          @val[k]
         end
 
         def average(k)
@@ -59,7 +63,6 @@ module LogfileInterval
       class Sum < Base
         def add(value, group_by = nil)
           @val.add(key(group_by), value)
-          @size.set(key(group_by), 1)
         end
       end
 
@@ -68,12 +71,15 @@ module LogfileInterval
           @val.add(key(group_by), value)
           @size.increment(key(group_by))
         end
+
+        def val(k)
+          average(k)
+        end
       end
 
       class Count < Base
         def add(value, group_by = nil)
           @val.add(key(group_by), 1)
-          @size.set(key(group_by), 1)
         end
       end
 
@@ -85,7 +91,6 @@ module LogfileInterval
         def add(value, group_by)
           raise ArgumentError, 'group_by argument is mandatory for GroupAndCount#add' unless group_by
           @val.increment_subkey(value, key(group_by))
-          @size.set(key(group_by), 1)
         end
       end
 
@@ -101,6 +106,10 @@ module LogfileInterval
             @size.increment(key(group_by))
           end
           @previous.set(key(group_by), value)
+        end
+
+        def val(k)
+          average(k)
         end
       end
     end

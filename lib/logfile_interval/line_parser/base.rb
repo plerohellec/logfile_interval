@@ -22,19 +22,23 @@ module LogfileInterval
         def add_column(options)
           name          = options.fetch(:name)
           pos           = options.fetch(:pos)
-          aggregator  = options.fetch(:aggregator)
           conversion    = options.fetch(:conversion, :string)
+          group_by      = options.fetch(:group_by, nil)
+          aggregator    = options.fetch(:aggregator)
           unless AGGREGATION_FUNCTIONS.include?(aggregator)
             raise ArgumentError, "aggregator must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
           end
 
-          if aggregator == :count && options[:group_by] && options[:group_by] != name
+          name      = name.to_sym
+          group_by  = group_by.to_sym unless group_by.nil?
+
+          if aggregator == :count && group_by && group_by != name
             aggregator = :group_and_count
           end
 
           aggregator = Aggregator.klass(aggregator)
           columns[name] = { :pos => pos, :aggregator => aggregator, :conversion => conversion }
-          columns[name][:group_by] = options[:group_by]
+          columns[name][:group_by] = group_by
 
           define_method(name) do
             @data[name]

@@ -22,7 +22,11 @@ module LogfileInterval
     end
 
     def [](name)
-      @data[name].values
+      @data[name.to_sym].values
+    end
+
+    def each(&block)
+      @data.each(&block)
     end
 
     def add_record(record)

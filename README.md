@@ -46,8 +46,7 @@ module LogfileInterval
   end
 end
 ```
-#### Writing a parser class
-The parser must define:
+#### The parser must define:
 * A regex that extracts the fields out of each line.
 * A set of columns that will to be parsed and aggregated in time intervals.
 * A 'time' method that converts the mandatory timestamp field of a line into a Time object.
