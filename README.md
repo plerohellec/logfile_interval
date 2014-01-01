@@ -21,7 +21,8 @@ Or install it yourself as:
 
 ## Example
 This example will parse an access.log file and aggregate the data into 5 minute intervals.
-### Script
+See [readme.rb](bin/readme.rb).
+### Code
 ```ruby
 require 'pp'
 require 'date'
@@ -67,6 +68,7 @@ builder.each_interval do |interval|
 end
 ```
 ### Output
+Logfile used for example: [access.log](spec/support/logfiles/access.log.3).
 ```
 start time of interval:            2012-01-01 16:30:00 -0800
 number of seconds in interval:     300
