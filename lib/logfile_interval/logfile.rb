@@ -7,8 +7,12 @@ module LogfileInterval
       @parser   = parser
     end
 
+    def exist?
+      filename && File.exist?(@filename)
+    end
+
     def first_timestamp
-      return nil unless File.exist?(@filename)
+      return unless exist?
       File.open(@filename) do |f|
         while line = f.gets
           if record = parser.create_record(line)
@@ -19,6 +23,7 @@ module LogfileInterval
     end
 
     def each_line
+      return unless exist?
       f = FileBackward.new(@filename)
       while(line = f.gets)
         yield line.chomp

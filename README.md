@@ -19,33 +19,81 @@ Or install it yourself as:
 
     $ gem install logfile_interval
 
+## Example
+This example will parse an access.log file and aggregate the data into 5 minute intervals.
+### Script
+```ruby
+require 'pp'
+require 'date'
+require 'logfile_interval'
+
+class AccessLog < LogfileInterval::LineParser::Base
+  # Example line:
+  # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
+
+  set_regex /^([\d\.]+)\s+.*\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+/
+
+  add_column :name => 'ip',           :pos => 1, :aggregator => :count,     :group_by => 'ip'
+  add_column :name => 'timestamp',    :pos => 2, :aggregator => :timestamp
+  add_column :name => 'code',         :pos => 4, :aggregator => :count,     :group_by => 'code'
+  add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
+
+  def time
+    DateTime.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z').to_time
+  end
+end
+
+path = ENV['ACCESS_LOG_PATH']
+file = LogfileInterval::Logfile.new(path, AccessLog)
+unless file.exist?
+  puts "#{path} is not found"
+  exit 1
+end
+
+builder = LogfileInterval::IntervalBuilder.new(file, 300)
+builder.each_interval do |interval|
+  next unless interval.size > 0
+
+  puts
+  puts "start time of interval:            #{interval.start_time}"
+  puts "number of seconds in interval:     #{interval.length}"
+  puts "number of requests found in interval: #{interval.size}"
+  puts "number of requests per ip address in interval:"
+  pp interval[:ip]
+  puts "number of requests per http code in interval:"
+  pp interval[:code]
+  puts "for each http code, number of requests grouped by ip:"
+  pp interval[:code_by_ip]
+end
+```
+### Output
+```
+start time of interval:            2012-01-01 16:30:00 -0800
+number of seconds in interval:     300
+number of requests found in interval: 4
+number of requests per ip address in interval:
+{"78.54.172.146"=>3, "66.249.68.148"=>1}
+number of requests per http code in interval:
+{"200"=>3, "302"=>1}
+for each ip, number of requests grouped by http code:
+{"200"=>{"78.54.172.146"=>2, "66.249.68.148"=>1}, "302"=>{"78.54.172.146"=>1}}
+
+start time of interval:            2012-01-01 16:25:00 -0800
+number of seconds in interval:     300
+number of requests found in interval: 3
+number of requests per ip address in interval:
+{"78.54.172.146"=>1, "173.192.238.51"=>1, "66.249.67.176"=>1}
+number of requests per http code in interval:
+{"200"=>1, "301"=>2}
+for each ip, number of requests grouped by http code:
+{"200"=>{"78.54.172.146"=>1}, "301"=>{"173.192.238.51"=>1, "66.249.67.176"=>1}}
+```
+
 ## Usage
 
 ### Write a LineParser class
-#### Example
-```ruby
-module LogfileInterval
-  module LineParser
-    class AccessLog < Base
-      # Example line:
-      # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
+The first step is to define a LineParser class as in the example above. The parser lists the fields that must be parsed, how a timestamp can be extracted from each line and how to aggregate values into intervals.
 
-      set_regex /^([\d\.]+)\s+\S+\s+\S+\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+(\d+)\s+"([^"]*)"\s+"([^"]+)"$/
-
-      add_column :name => 'ip',           :pos => 1, :aggregator => :count,     :group_by => 'ip'
-      add_column :name => 'timestamp',    :pos => 2, :aggregator => :timestamp
-      add_column :name => 'code',         :pos => 4, :aggregator => :count,     :group_by => 'code'
-      add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
-      add_column :name => 'length',       :pos => 5, :aggregator => :average,                      :conversion => :integer
-      add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :group_by => 'ip', :conversion => :integer
-
-      def time
-        Time.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z')
-      end
-    end
-  end
-end
-```
 #### The parser must define:
 * A regex that extracts the fields out of each line.
 * A set of columns that will to be parsed and aggregated in time intervals.
@@ -56,7 +104,7 @@ end
 * pos:  the position of the captured field in the regex matched data
 * aggregator : the aggregation mode for this field
 * conversion: the parser will convert the field to an integer or a float when building the parsed record
-* group_by: group_by value is the name of another field. The aggregator will apply the aggregator to this field for each distinct value found in the other field.
+* group_by: group_by value is the name of another field. Values will be aggregated for each 'name', 'group_by' pair.
 
 #### Aggregator types and options
 * timestamp: the timestamp field will be used to determine to which interval the line belongs, each line MUST have a timestamp

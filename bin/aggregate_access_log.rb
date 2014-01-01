@@ -37,7 +37,7 @@ builder.each_interval do |interval|
   puts
   puts "start_time=#{interval.start_time} size=#{interval.size}"
   pp interval[:ip]
-  pp interval[:referer]
+  pp interval[:referer_by_ip]
   STDIN.gets
 end
 
