@@ -1,8 +1,6 @@
 module LogfileInterval
   module LineParser
     class Counter < Hash
-      class ValueTypeError < StandardError; end
-
       def increment(key)
         if self.has_key?(key)
           self[key] += 1

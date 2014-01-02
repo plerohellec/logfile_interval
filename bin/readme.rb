@@ -28,7 +28,6 @@ unless file.exist?
 end
 
 builder = LogfileInterval::IntervalBuilder.new(file, 300)
-debugger
 builder.each_interval do |interval|
   next unless interval.size > 0
 
