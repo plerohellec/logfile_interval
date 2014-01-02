@@ -13,7 +13,7 @@ Add this line to your application's Gemfile:
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ## Example
 This example will parse an access.log file and aggregate the data into 5 minute intervals.
-See [readme.rb](bin/readme.rb).
+Full script is in [readme.rb](bin/readme.rb).
 ### Code
 ```ruby
 require 'pp'
@@ -95,7 +95,29 @@ for each ip, number of requests grouped by http code:
 
 ### Write a LineParser class
 The first step is to define a LineParser class as in the example above. The parser lists the fields that must be parsed, how a timestamp can be extracted from each line and how to aggregate values into intervals.
+```ruby
+module LogfileInterval
+  module LineParser
+    class AccessLog < Base
+      # Example line:
+      # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
 
+      set_regex /^([\d\.]+)\s+\S+\s+\S+\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+(\d+)\s+"([^"]*)"\s+"([^"]+)"$/
+
+      add_column :name => 'ip',           :pos => 1, :aggregator => :count,     :group_by => 'ip'
+      add_column :name => 'timestamp',    :pos => 2, :aggregator => :timestamp
+      add_column :name => 'code',         :pos => 4, :aggregator => :count,     :group_by => 'code'
+      add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
+      add_column :name => 'length',       :pos => 5, :aggregator => :average,                      :conversion => :integer
+      add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :group_by => 'ip', :conversion => :integer
+
+      def time
+        Time.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z')
+      end
+    end
+  end
+end
+```
 #### The parser must define:
 * A regex that extracts the fields out of each line.
 * A set of columns that will to be parsed and aggregated in time intervals.
