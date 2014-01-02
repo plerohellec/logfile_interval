@@ -2,25 +2,19 @@
 
 Logfile parser and aggregator.
 
-It iterates over each line of logfiles, parses each line and aggregates all lines in a time interval into a single
-record made up of the sum, the average, the number of occurences per value or average of the deltas between lines.
+It iterates over 1 or more logfiles, parses each line and aggregates them into time intervals. Each interval object
+includes aggregated data for each field of the logfile.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'logfile_interval'
-
-And then execute:
-
-    $ bundle install
-
-Or install it yourself as:
-
-    $ gem install logfile_interval
+Aggregated data can be for example the sum, the average value or the number of occurences of each value.
 
 ## Example
 This example will parse an access.log file and aggregate the data into 5 minute intervals.
+
+In each interval, it counts
+* the number of requests per IP address
+* the number of requests for each HTTP status code
+* the number of requests for each HTTP status code and IP address.
+
 Full script is in [readme.rb](bin/readme.rb).
 ### Code
 ```ruby
@@ -56,8 +50,8 @@ builder.each_interval do |interval|
   next unless interval.size > 0
 
   puts
-  puts "start time of interval:            #{interval.start_time}"
-  puts "number of seconds in interval:     #{interval.length}"
+  puts "start time of interval:               #{interval.start_time}"
+  puts "number of seconds in interval:        #{interval.length}"
   puts "number of requests found in interval: #{interval.size}"
   puts "number of requests per ip address in interval:"
   pp interval[:ip]
@@ -92,7 +86,6 @@ for each ip, number of requests grouped by http code:
 ```
 
 ## Usage
-
 ### Write a LineParser class
 The first step is to define a LineParser class as in the example above. The parser lists the fields that must be parsed, how a timestamp can be extracted from each line and how to aggregate values into intervals.
 ```ruby
@@ -192,8 +185,20 @@ interval_builder.each_interval do |interval|
 end
 ```
 
-## Contributing
+## Installation
+Add this line to your application's Gemfile:
 
+    gem 'logfile_interval'
+
+And then execute:
+
+    $ bundle install
+
+Or install it yourself as:
+
+    $ gem install logfile_interval
+
+## Contributing
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
