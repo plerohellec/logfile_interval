@@ -5,9 +5,13 @@ module LogfileInterval
   data_dir = File.join(File.dirname(__FILE__), '..', 'support/logfiles')
 
   describe Interval do
+    before :each do
+      @end_time = Time.new(2013, 12, 01, 16, 00, 00, '-08:00')
+      @length = 300
+    end
+
     it 'gets instantiated with empty data' do
-      end_time = Time.new(2013, 12, 01, 16, 00, 00, '-08:00')
-      interval = Interval.new(end_time, 300, LineParser::TimingLog)
+      interval = Interval.new(@end_time, @length, LineParser::TimingLog)
       interval.size.should == 0
       interval[:total_time].should == 0
       interval[:num_bytes].should == 0
@@ -15,12 +19,32 @@ module LogfileInterval
       interval[:ip].should == 0
     end
 
-    context :add_record do
-      before :each do
-        @end_time = Time.new(2013, 12, 01, 16, 00, 00, '-08:00')
-        @length = 300
+    context :to_hash do
+      it 'returns a hash' do
+        interval = Interval.new(@end_time, @length, LineParser::TimingLog)
+        interval.to_hash.should be_a(Hash)
       end
 
+      it 'has a key for all columns' do
+        record   = LineParser::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 2000, 53.0')
+        interval = Interval.new(@end_time, @length, LineParser::TimingLog)
+        interval.add_record(record)
+        hinterval = interval.to_hash
+        hinterval.keys.should include(:ip, :total_time, :action, :num_bytes, :rss)
+      end
+
+      it 'with no data, should have keys with 0 values' do
+        interval = Interval.new(@end_time, @length, LineParser::TimingLog)
+        hinterval = interval.to_hash
+        hinterval[:ip].should == 0
+        hinterval[:action].should == 0
+        hinterval[:total_time].should == 0
+        hinterval[:num_bytes].should == 0
+        hinterval[:rss].should == 0
+      end
+    end
+
+    context :add_record do
       context 'basics' do
         before :each do
           @interval = Interval.new(@end_time, @length, LineParser::TimingLog)

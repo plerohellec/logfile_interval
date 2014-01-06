@@ -29,6 +29,15 @@ module LogfileInterval
       @data.each(&block)
     end
 
+    def to_hash
+      @data.inject({}) do |h, pair|
+        k = pair[0]
+        v = pair[1]
+        h[k] = v.values
+        h
+      end
+    end
+
     def add_record(record)
       return unless record.valid?
       raise ParserMismatch unless record.class == parser
