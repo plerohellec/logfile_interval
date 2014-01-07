@@ -1,5 +1,5 @@
 module LogfileInterval
-  module LineParser
+  module Util
     class Counter < Hash
       def increment(key)
         if self.has_key?(key)

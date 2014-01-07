@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module LogfileInterval
-  module LineParser
+  module Util
     describe Counter do
       it 'behaves like a hash' do
         c = Counter.new

@@ -74,7 +74,7 @@ module LogfileInterval
 
       context 'with count and group by options' do
         it 'creates an aggregator of type GroupAndCount' do
-          expect(LineParser::Aggregator::GroupAndCount).to receive(:new)
+          expect(Aggregator::GroupAndCount).to receive(:new)
           interval = Interval.new(@end_time, @length, LineParser::TimingLogWithGrouping)
         end
 
