@@ -24,7 +24,7 @@ module LogfileInterval
 
     def each_line
       return unless exist?
-      f = FileBackward.new(@filename)
+      f = Util::FileBackward.new(@filename)
       while(line = f.gets)
         yield line.chomp
       end
