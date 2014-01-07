@@ -13,7 +13,7 @@ module LogfileInterval
 
         def parse(line)
           match_data = regex.match(line)
-          @data = f(match_data)
+          data = f(match_data)
         end
 
         def create_record(line)
@@ -21,7 +21,6 @@ module LogfileInterval
           return record.valid? ? record : nil
         end
       end
-
     end
 
     class AccessLog < Base
@@ -32,36 +31,36 @@ module LogfileInterval
         @data = self.class.parse(line)
       end
     end
+  end
 
-    module Aggregator
-      def self.klass(aggregator)
-        case aggregator
-        when :sum then Sum
-        end
+  module Aggregator
+    def self.klass(aggregator)
+      case aggregator
+      when :sum then Sum
+      end
+    end
+
+    class Sum
+      def initialize
+        @val = 0
       end
 
-      class Sum
-        def initialize
-          @val = 0
-        end
-
-        def add(value)
-          @val += value
-        end
-
-        def value
-          @val
-        end
+      def add(value)
+        @val += value
       end
 
-      class Count
-        def initialize
-          @val = Counter.new
-        end
+      def value
+        @val
+      end
+    end
 
-        def add(value)
-          @val.increment(value)
-        end
+    class Count
+      def initialize
+        @val = Counter.new
+      end
+
+      def add(value)
+        @val.increment(value)
       end
     end
   end
