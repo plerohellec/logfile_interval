@@ -33,6 +33,30 @@ module LogfileInterval
     end
   end
 
+
+  class Interval
+    def initialize(end_time, length, parser)
+      @data = {}
+      parser.columns.each do |name, options|
+        @data[name] = options[:aggregator].new
+      end
+    end
+
+    def [](name)
+      @data[name].value
+    end
+
+    def add_record(record)
+      return unless record.valid?
+      raise ParserMismatch unless record.class == parser
+
+      @size += 1
+      parser.columns.each do |name, options|
+        @data[name].add(record[name])
+      end
+    end
+  end
+
   module Aggregator
     def self.klass(aggregator)
       case aggregator
@@ -47,10 +71,6 @@ module LogfileInterval
 
       def add(value)
         @val += value
-      end
-
-      def value
-        @val
       end
     end
 
@@ -84,7 +104,7 @@ module LogfileInterval
     def initialize(filenames_array, parser)
     end
 
-    def ordered_filenams
+    def ordered_filenames
     end
 
     def each_line
@@ -114,29 +134,6 @@ module LogfileInterval
   class Counter < Hash
     def increment(key)
       self[key] = self[key] ? self[key] + 1 : 1
-    end
-  end
-
-  class Interval
-    def initialize(end_time, length, parser)
-      @data = {}
-      parser.columns.each do |name, options|
-        @data[name] = options[:aggregator].new
-      end
-    end
-
-    def [](name)
-      @data[name].value
-    end
-
-    def add_record(record)
-      return unless record.valid?
-      raise ParserMismatch unless record.class == parser
-
-      @size += 1
-      parser.columns.each do |name, options|
-        @data[name].add(record[name])
-      end
     end
   end
 end
