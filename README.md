@@ -38,12 +38,7 @@ class AccessLog < LogfileInterval::LineParser::Base
   end
 end
 
-path = ENV['ACCESS_LOG_PATH']
-file = LogfileInterval::Logfile.new(path, AccessLog)
-unless file.exist?
-  puts "#{path} is not found"
-  exit 1
-end
+file = LogfileInterval::Logfile.new('path_to_logfile', AccessLog)
 
 builder = LogfileInterval::IntervalBuilder.new(file, 300)
 builder.each_interval do |interval|
