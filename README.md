@@ -184,6 +184,8 @@ interval_builder.each_interval do |interval|
   end
 end
 ```
+## Design document
+Design outline is at [design.rb](docs/design.rb).
 
 ## Installation
 Add this line to your application's Gemfile:
