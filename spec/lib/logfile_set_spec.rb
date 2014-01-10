@@ -8,32 +8,57 @@ module LogfileInterval
     before :each do
       @logfiles = ["#{data_dir}/access.log.2", "#{data_dir}/access.log.1"]
       @set = LogfileSet.new(@logfiles, LineParser::AccessLog)
+      @first_line = '66.249.67.176 - - [23/Jun/2013:17:00:01 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 185 "-" "Google"'
+      @second_line = '12.24.48.96 - - [23/Jun/2013:16:59:00 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 4555 "-" "Bing)"'
+      @last_line  = '12.24.48.96 - - [23/Jun/2013:16:49:00 -0800] "GET /package/core/raring/universe/proposed/bash HTTP/1.1" 200 4555 "-" "Bing)"'
     end
 
     it 'ordered_filenames should return the most recent file first' do
       @set.ordered_filenames.should == @logfiles.reverse
     end
 
-    it 'each_line should enumerate each line in file backwards' do
-      lines = []
-      @set.each_line do |line|
-        lines << line
+    describe :each_line do
+      it 'should enumerate each line in file backwards' do
+        lines = []
+        @set.each_line do |line|
+          lines << line
+        end
+
+        lines.first.should == @first_line
+        lines.last.should  == @last_line
       end
 
-      lines.first.should == '66.249.67.176 - - [23/Jun/2013:17:00:01 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 185 "-" "Google"'
-      lines.last.should == '12.24.48.96 - - [23/Jun/2013:16:49:00 -0800] "GET /package/core/raring/universe/proposed/bash HTTP/1.1" 200 4555 "-" "Bing)"'
+      context 'without a block' do
+        it 'should return an enumerator' do
+          e = @set.each_line
+          e.should be_a(Enumerator)
+          e.first.should == @first_line
+          e.next.should  == @first_line
+          e.next.should  == @second_line
+        end
+      end
     end
 
-    it 'each_parsed_line should enumerate each line backwards' do
-      records = []
-      @set.each_parsed_line do |record|
-        records << record
+    describe :each_parsed_line do
+      it 'should enumerate each line backwards' do
+        records = []
+        @set.each_parsed_line do |record|
+          records << record
+        end
+
+        records.first.time.should == Time.new(2013, 06, 23, 17, 00, 01, '-08:00')
+        records.first.code.should == '200'
+        records.last.time.should  == Time.new(2013, 06, 23, 16, 49, 00, '-08:00')
+        records.last.code.should == '200'
       end
 
-      records.first.time.should == Time.new(2013, 06, 23, 17, 00, 01, '-08:00')
-      records.first.code.should == '200'
-      records.last.time.should  == Time.new(2013, 06, 23, 16, 49, 00, '-08:00')
-      records.last.code.should == '200'
+      context 'without a block' do
+        it 'should return an enumerator' do
+          e = @set.each_parsed_line
+          e.should be_a(Enumerator)
+          e.next.time.should == Time.new(2013, 06, 23, 17, 00, 01, '-08:00')
+        end
+      end
     end
   end
 end

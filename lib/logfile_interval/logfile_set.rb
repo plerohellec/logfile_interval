@@ -21,6 +21,8 @@ module LogfileInterval
     end
 
     def each_parsed_line
+      return enum_for(:each_parsed_line) unless block_given?
+
       ordered_filenames.each do |filename|
         tfile = Logfile.new(filename, parser)
         tfile.each_parsed_line do |record|
@@ -30,6 +32,8 @@ module LogfileInterval
     end
 
     def each_line
+      return enum_for(:each_line) unless block_given?
+
       ordered_filenames.each do |filename|
         tfile = Logfile.new(filename, parser)
         tfile.each_line do |line|

@@ -47,6 +47,14 @@ module LogfileInterval
           @intervals.last[:action].should == 2
         end
       end
+
+      context 'without a block' do
+        it 'should return an iterator' do
+          e = @builder.each_interval
+          e.should be_an(Enumerator)
+          e.next.end_time.should == Time.new(2013,12,01,16,0,0,'-08:00')
+        end
+      end
     end
 
     context :last_interval do

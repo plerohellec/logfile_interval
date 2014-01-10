@@ -24,6 +24,8 @@ module LogfileInterval
 
     def each_line
       return unless exist?
+      return enum_for(:each_line) unless block_given?
+
       f = Util::FileBackward.new(@filename)
       while(line = f.gets)
         yield line.chomp
@@ -32,6 +34,7 @@ module LogfileInterval
     end
 
     def each_parsed_line
+      return enum_for(:each_parsed_line) unless block_given?
       each_line do |line|
         record = parser.create_record(line)
         yield record if record
