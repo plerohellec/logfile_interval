@@ -1,7 +1,5 @@
 lib_dir = File.expand_path('..', __FILE__)
 
-puts "lib_dir=#{lib_dir}"
-
 require "#{lib_dir}/aggregator/base"
 require "#{lib_dir}/aggregator/sum"
 require "#{lib_dir}/aggregator/count"
