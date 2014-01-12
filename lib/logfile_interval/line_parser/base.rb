@@ -1,6 +1,6 @@
 module LogfileInterval
   module LineParser
-    AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :count, :delta ]
+    AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :count, :delta, :custom ]
 
     class InvalidLine         < StandardError; end
     class ConfigurationError  < StandardError; end
@@ -25,6 +25,12 @@ module LogfileInterval
           conversion    = options.fetch(:conversion, :string)
           group_by      = options.fetch(:group_by, nil)
           aggregator    = options.fetch(:aggregator)
+          if aggregator == :custom
+            custom_class = options.fetch(:custom_class) {
+              raise ConfigurationError.new(':custom_class must be set for :custom aggregator type')
+            }
+            custom_options = options.fetch(:custom_options, {})
+          end
           unless AGGREGATION_FUNCTIONS.include?(aggregator)
             raise ArgumentError, "aggregator must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
           end
@@ -32,13 +38,10 @@ module LogfileInterval
           name      = name.to_sym
           group_by  = group_by.to_sym unless group_by.nil?
 
-          if aggregator == :count && group_by && group_by != name
-            aggregator = :group_and_count
-          end
-
-          aggregator = Aggregator.klass(aggregator)
-          columns[name] = { :pos => pos, :aggregator => aggregator, :conversion => conversion }
-          columns[name][:group_by] = group_by
+          agg = Aggregator.klass(options)
+          columns[name] = { :pos => pos, :aggregator_class => agg, :conversion => conversion }
+          columns[name][:group_by] = group_by if group_by
+          columns[name][:custom_options] = custom_options if custom_options
 
           define_method(name) do
             @data[name]

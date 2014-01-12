@@ -3,7 +3,7 @@ module LogfileInterval
     class Base
       include Enumerable
 
-      def initialize
+      def initialize(options = {})
         @val = Util::Counter.new
         @size = Util::Counter.new
       end
