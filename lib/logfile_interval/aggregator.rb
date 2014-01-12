@@ -11,13 +11,18 @@ require "#{lib_dir}/aggregator/delta"
 
 module LogfileInterval
   module Aggregator
-    def self.klass(aggregator)
-      case aggregator
+    def self.klass(options)
+      case options[:aggregator]
       when :sum               then Sum
       when :average           then Average
-      when :count             then Count
-      when :group_and_count   then GroupAndCount
+      when :count
+        if options[:group_by] && options[:group_by] != options[:name]
+          GroupAndCount
+        else
+          Count
+        end
       when :delta             then Delta
+      when :custom            then options.fetch(:custom_class)
       end
     end
   end

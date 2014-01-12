@@ -1,14 +1,18 @@
 require 'spec_helper'
 
 module LogfileInterval
+
   module Aggregator
+    class CustomAggregator; end
+      
     describe Aggregator do
       it 'finds the aggregator class' do
-        Aggregator.klass(:sum).should == Sum
-        Aggregator.klass(:average).should == Average
-        Aggregator.klass(:count).should == Count
-        Aggregator.klass(:group_and_count).should == GroupAndCount
-        Aggregator.klass(:delta).should == Delta
+        Aggregator.klass({ :aggregator => :sum}).should == Sum
+        Aggregator.klass({ :aggregator => :average}).should == Average
+        Aggregator.klass({ :aggregator => :count}).should == Count
+        Aggregator.klass({ :aggregator => :count, :group_by => :foo}).should == GroupAndCount
+        Aggregator.klass({ :aggregator => :delta}).should == Delta
+        Aggregator.klass({ :aggregator => :custom, :custom_class => CustomAggregator}).should == CustomAggregator
       end
     end
 

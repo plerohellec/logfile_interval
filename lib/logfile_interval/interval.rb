@@ -16,8 +16,12 @@ module LogfileInterval
 
       @data = {}
       parser.columns.each do |name, options|
-        next unless agg = options[:aggregator]
-        @data[name] = agg.new
+        next unless agg = options[:aggregator_class]
+        if custom_options = options[:custom_options]
+          @data[name] = agg.new(custom_options)
+        else
+          @data[name] = agg.new
+        end
       end
     end
 
