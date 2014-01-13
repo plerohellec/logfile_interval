@@ -20,28 +20,11 @@ module LogfileInterval
         end
 
         def add_column(options)
-          name          = options.fetch(:name)
-          pos           = options.fetch(:pos)
-          conversion    = options.fetch(:conversion, :string)
-          group_by      = options.fetch(:group_by, nil)
-          aggregator    = options.fetch(:aggregator)
-          if aggregator == :custom
-            custom_class = options.fetch(:custom_class) {
-              raise ConfigurationError.new(':custom_class must be set for :custom aggregator type')
-            }
-            custom_options = options.fetch(:custom_options, {})
-          end
-          unless AGGREGATION_FUNCTIONS.include?(aggregator)
-            raise ArgumentError, "aggregator must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
-          end
+          validate_column_options(options)
+          options = sanitize_column_options(options)
 
-          name      = name.to_sym
-          group_by  = group_by.to_sym unless group_by.nil?
-
-          agg = Aggregator.klass(options)
-          columns[name] = { :pos => pos, :aggregator_class => agg, :conversion => conversion }
-          columns[name][:group_by] = group_by if group_by
-          columns[name][:custom_options] = custom_options if custom_options
+          name = options[:name]
+          columns[name] = options
 
           define_method(name) do
             @data[name]
@@ -73,6 +56,33 @@ module LogfileInterval
         private
 
         def validate_column_options(options)
+          validate_option(options, :name)
+          validate_option(options, :pos)
+          validate_option(options, :aggregator)
+          unless AGGREGATION_FUNCTIONS.include?(options[:aggregator])
+            raise ConfigurationError, "aggregator must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
+          end
+          if options[:aggregator] == :custom
+            validate_option(options, :custom_class, ':custom_class must be set for :custom aggregator type')
+          end
+        end
+
+        def validate_option(options, key, errmsg = nil)
+          raise ConfigurationError, errmsg || "#{key} is a mandatory column option" unless options.has_key?(key)
+        end
+
+        def sanitize_column_options(options)
+          options[:name]       = options[:name].to_sym
+          if options.has_key?(:group_by)
+            options[:group_by]   = options[:group_by].to_sym
+          end
+          options[:conversion] = options.fetch(:conversion, :string)
+          if options[:aggregator] == :custom
+            options[:custom_options] = options.fetch(:custom_options, {})
+          end
+          options[:aggregator_class] = Aggregator.klass(options)
+          options.delete(:aggregator)
+          options
         end
 
         def convert(val, conversion)
