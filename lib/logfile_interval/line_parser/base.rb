@@ -36,7 +36,6 @@ module LogfileInterval
 
           match_data = regex.match(line)
           return nil unless match_data
-          return nil unless match_data.size >= columns.size+1
 
           data = {}
           columns.each do |name, options|
