@@ -6,6 +6,7 @@ module LogfileInterval
       def initialize(options = {})
         @val = Util::Counter.new
         @size = Util::Counter.new
+        @options = options
       end
 
       def value(group = nil)

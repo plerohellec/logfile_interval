@@ -2,7 +2,6 @@ module LogfileInterval
   module LineParser
     AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :count, :delta, :custom ]
 
-    class InvalidLine         < StandardError; end
     class ConfigurationError  < StandardError; end
 
     class Base
@@ -51,6 +50,12 @@ module LogfileInterval
           record = new(line)
           return record if record.valid?
           return nil
+        end
+
+        def set_column_custom_options(column_name, options)
+          raise ArgumentError, "Invalid column name: #{column_name}" unless columns.has_key?(column_name)
+          raise ArgumentError, "This column is not custom: #{column_name}" unless columns[column_name].has_key?(:custom_class)
+          columns[column_name][:custom_options] = options
         end
 
         private

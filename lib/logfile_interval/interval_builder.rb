@@ -10,7 +10,7 @@ module LogfileInterval
 
     def each_interval
       return enum_for(:each_interval) unless block_given?
-      
+
       secs = (Time.now.to_i / length.to_i) * length.to_i
       rounded_end_time = Time.at(secs)
       current_interval = Interval.new(rounded_end_time, length, parser)
