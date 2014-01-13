@@ -26,6 +26,7 @@ module LogfileInterval
     end
 
     def [](name)
+      raise ArgumentError, "#{name} field does not exist" unless @data.has_key?(name)
       @data[name.to_sym].values
     end
 
