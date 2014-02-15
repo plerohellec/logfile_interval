@@ -2,9 +2,14 @@ module LogfileInterval
   class Logfile
     attr_reader :filename, :parser
 
-    def initialize(filename, parser)
+    ORDER_VALID_VALUES = [ :asc, :desc ]
+
+    def initialize(filename, parser, order = :desc)
       @filename = filename
       @parser   = parser
+      @order    = order
+
+      raise ArgumentError, "invalid order value: #{@order}" unless ORDER_VALID_VALUES.include?(@order.to_sym)
     end
 
     def exist?
@@ -26,11 +31,12 @@ module LogfileInterval
       return unless exist?
       return enum_for(:each_line) unless block_given?
 
-      f = Util::FileBackward.new(@filename)
-      while(line = f.gets)
-        yield line.chomp
+      case @order
+      when :asc
+        each_line_ascending { |l| yield l }
+      when :desc
+        each_line_descending { |l| yield l }
       end
-      f.close
     end
 
     def each_parsed_line
@@ -38,6 +44,23 @@ module LogfileInterval
       each_line do |line|
         record = parser.create_record(line)
         yield record if record
+      end
+    end
+
+    private
+    def each_line_descending
+      f = Util::FileBackward.new(@filename)
+      while(line = f.gets)
+        yield line.chomp
+      end
+      f.close
+    end
+
+    def each_line_ascending
+      File.open(@filename) do |f|
+        f.each_line do |line|
+          yield line.chomp
+        end
       end
     end
   end

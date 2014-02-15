@@ -150,7 +150,7 @@ log.each_parsed_line do |record|
   puts record.length
 end
 ```
-**Note**: the Logfile iterators always start with the last line in the file and works its way backward.
+**Note**: the Logfile iterators by default start with the last line in the file and works its way backward. To iterate in ascending order, pass :asc as the order argument in Logfile or LogfileSet#initialize.
 
 ### Iterate through lines of multiples files
 And get a parsed record for each line.

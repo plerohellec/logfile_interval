@@ -37,6 +37,28 @@ module LogfileInterval
           e.next.should  == @second_line
         end
       end
+
+      context :order do
+        it 'iterates backward when order is :desc' do
+          lines = []
+          set = LogfileSet.new(@logfiles, LineParser::AccessLog, :desc)
+          set.each_line do |line|
+            lines << line
+          end
+          lines.last.should  == @last_line
+          lines.first.should == @first_line
+        end
+
+        it 'iterates upward when order is :asc' do
+          lines = []
+          set = LogfileSet.new(@logfiles, LineParser::AccessLog, :asc)
+          set.each_line do |line|
+            lines << line
+          end
+          lines.first.should == @last_line
+          lines.last.should  == @first_line
+        end
+      end
     end
 
     describe :each_parsed_line do
