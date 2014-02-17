@@ -168,7 +168,8 @@ end
 ### Aggregate lines into intervals
 ```ruby
 length = 5.minutes
-interval_builder = LogfileInterval::IntervalBuilder.new(set, length)
+parsed_line_enum = set.each_parsed_line
+interval_builder = LogfileInterval::IntervalBuilder.new(parsed_line_enum, parser, length)
 interval_builder.each_interval do |interval|
   puts interval.class  # LogfileInterval::Interval
   puts interval.start_time
