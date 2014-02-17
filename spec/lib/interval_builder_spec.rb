@@ -8,7 +8,7 @@ module LogfileInterval
     before :each do
       @logfiles = ["#{data_dir}/timing.log", "#{data_dir}/timing.log.1" ]
       @set = LogfileSet.new(@logfiles, LineParser::TimingLog)
-      @builder = IntervalBuilder.new(@set, 300)
+      @builder = IntervalBuilder.new(@set.each_parsed_line, LineParser::TimingLog, 300)
     end
 
     context :each_interval do

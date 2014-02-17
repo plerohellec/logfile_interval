@@ -51,11 +51,5 @@ module LogfileInterval
         end
       end
     end
-
-    def last_record
-      each_parsed_line do |record|
-        return record
-      end
-    end
   end
 end

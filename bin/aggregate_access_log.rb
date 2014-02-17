@@ -30,7 +30,7 @@ class AccessLogParser < LogfileInterval::LineParser::Base
 end
 
 file = LogfileInterval::Logfile.new(logfile, AccessLogParser)
-builder = LogfileInterval::IntervalBuilder.new(file, 300)
+builder = LogfileInterval::IntervalBuilder.new(file.each_parsed_line, AccessLogParser, 300)
 builder.each_interval do |interval|
   next unless interval.size > 0
 

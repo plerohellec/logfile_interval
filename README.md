@@ -38,9 +38,11 @@ class AccessLog < LogfileInterval::LineParser::Base
   end
 end
 
-file = LogfileInterval::Logfile.new('path_to_logfile', AccessLog)
+parser = AccessLog
+file = LogfileInterval::Logfile.new('path_to_logfile', parser)
+parsed_line_enum = file.each_parsed_line
 
-builder = LogfileInterval::IntervalBuilder.new(file, 300)
+builder = LogfileInterval::IntervalBuilder.new(parsed_line_enum, parser, 300)
 builder.each_interval do |interval|
   next unless interval.size > 0
 
