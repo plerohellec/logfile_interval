@@ -14,28 +14,28 @@ module LogfileInterval
       @parser     = parser
       @size = 0
 
-      @data = {}
+      @aggregators = {}
       parser.columns.each do |name, options|
-        next unless agg = options[:aggregator_class]
+        next unless klass = options[:aggregator_class]
         if custom_options = options[:custom_options]
-          @data[name] = agg.new(custom_options)
+          @aggregators[name] = klass.new(custom_options)
         else
-          @data[name] = agg.new
+          @aggregators[name] = klass.new
         end
       end
     end
 
     def [](name)
-      raise ArgumentError, "#{name} field does not exist" unless @data.has_key?(name)
-      @data[name.to_sym].values
+      raise ArgumentError, "#{name} field does not exist" unless @aggregators.has_key?(name)
+      @aggregators[name.to_sym].values
     end
 
     def each(&block)
-      @data.each(&block)
+      @aggregators.each(&block)
     end
 
     def to_hash
-      @data.inject({}) do |h, pair|
+      @aggregators.inject({}) do |h, pair|
         k = pair[0]
         v = pair[1]
         h[k] = v.values
@@ -52,9 +52,9 @@ module LogfileInterval
       @size += 1
 
       parser.columns.each do |name, options|
-        next unless @data[name]
+        next unless @aggregators[name]
         group_by_value = record[options[:group_by]] if options[:group_by]
-        @data[name].add(record[name], group_by_value)
+        @aggregators[name].add(record[name], group_by_value)
       end
     end
   end
