@@ -8,7 +8,7 @@ module LogfileInterval
       attr_reader :data
 
       class << self
-        attr_reader :regex
+        attr_reader :regex, :columns
 
         def columns
           @columns ||= {}
@@ -55,6 +55,11 @@ module LogfileInterval
           raise ArgumentError, "Invalid column name: #{column_name}" unless columns.has_key?(column_name)
           raise ArgumentError, "This column is not custom: #{column_name}" unless columns[column_name].has_key?(:custom_class)
           columns[column_name][:custom_options] = options
+        end
+
+
+        def each(&block)
+          columns.each(&block)
         end
 
         private

@@ -14,18 +14,16 @@ module LogfileInterval
           @columns[name] = { :pos => pos, :aggregator => agg, :conversion => conversion }
           define_method(name)
         end
-      end
 
-      def parse(line)
-        match_data = regex.match(line)
-        data = {}
-        data = f(match_data)
+        def create_parsed_line(line)
+          match_data = regex.match(line)
+          data = {}
+          data = f(match_data)
+        end
       end
     end
 
-    class AccessLogParser < Base
-      set_regex /blah/
-      add_column :name => :foo, :pos => 1, :conversion => integer, :aggregator => :average
+    class ParsedLine
     end
   end
 
@@ -52,11 +50,11 @@ module LogfileInterval
 
   class Interval
     def initialize(end_time, length, parser_columns)
-      @data = AggregatorSet.new(parser_columns)
+      @aggregators = AggregatorSet.new(parser_columns)
     end
 
     def [](name)
-      @data[name].value
+      @aggregators[name].value
     end
 
     def add(record)
@@ -146,6 +144,12 @@ module LogfileInterval
     end
   end
 end
+
+class AccessLogParser < LogfileInterval::Parse::Base
+  set_regex /blah/
+  add_column :name => :foo, :pos => 1, :conversion => integer, :aggregator => :average
+end
+
 
 logfiles = [ 'access.log', 'access.log.1', 'access.log.2' ]
 logfile = logfiles.first
