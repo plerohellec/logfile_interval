@@ -1,10 +1,10 @@
 module LogfileInterval
   class IntervalBuilder
-    attr_reader :parsed_line_enum, :parser, :length
+    attr_reader :parsed_line_enum, :parser_columns, :length
 
-    def initialize(parsed_line_enum, parser, length)
+    def initialize(parsed_line_enum, parser_columns, length)
       @parsed_line_enum = parsed_line_enum
-      @parser           = parser
+      @parser_columns   = parser_columns
       @length           = length
     end
 
@@ -13,13 +13,13 @@ module LogfileInterval
 
       secs = (Time.now.to_i / length.to_i) * length.to_i
       rounded_end_time = Time.at(secs)
-      current_interval = Interval.new(rounded_end_time, length, parser)
+      current_interval = Interval.new(rounded_end_time, length, parser_columns)
 
       parsed_line_enum.each do |record|
         next if record.time > current_interval.end_time
         while record.time <= current_interval.start_time
           yield current_interval
-          current_interval = Interval.new(current_interval.start_time, length, parser)
+          current_interval = Interval.new(current_interval.start_time, length, parser_columns)
         end
         current_interval.add_record(record)
       end

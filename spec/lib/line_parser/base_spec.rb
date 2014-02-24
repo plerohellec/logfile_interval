@@ -25,6 +25,21 @@ module LogfileInterval
         record.valid?.should be_false
       end
 
+      describe 'class' do
+        subject { AccessLog }
+
+        it { should respond_to :each }
+
+        describe '#each' do
+          it 'iterates over columns' do
+            AccessLog.each do |col|
+              col.first.should be_a(Symbol)
+              col.last.should be_a(Hash)
+            end
+          end
+        end
+    end
+
       context :create_record do
 
         it 'instanciates a new AccessLog object' do
