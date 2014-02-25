@@ -4,11 +4,23 @@ module LogfileInterval
 
       class << self
         def aggregator_classes
-          @aggregator_classes ||= {}
+          @@aggregator_classes ||= {}
         end
 
         def register_aggregator(name, klass)
           aggregator_classes[name] = klass
+        end
+
+        def klass(name)
+          aggregator_classes[name]
+        end
+
+        def exist?(name)
+          aggregator_classes.include?(name)
+        end
+
+        def all
+          aggregator_classes.keys
         end
       end
 
@@ -65,4 +77,11 @@ module LogfileInterval
       end
     end
   end
+end
+
+current_dir = File.expand_path('..', __FILE__)
+agg_files = Dir.glob("#{current_dir}/*.rb").reject { |file| file =~ /base.rb/ }
+agg_files.each do |agg_file|
+  puts "requiring #{agg_file}"
+  require agg_file
 end

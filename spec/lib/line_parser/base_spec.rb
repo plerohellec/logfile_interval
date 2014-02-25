@@ -80,10 +80,6 @@ module LogfileInterval
       it 'must fail unless a column is configured'do
         lambda { NoColumnLog.new(@line) }.should raise_error ConfigurationError
       end
-
-      it 'must fail with custom aggregator but no custom class' do
-        lambda { MissingCustomClass.add_column(:name => 'ip', :pos => 1, :aggregator => :custom) }.should raise_error ConfigurationError
-      end
     end
 
     describe TimingLog do

@@ -10,7 +10,7 @@ module LogfileInterval
         end
 
         def add_column
-          agg = Aggregators.klass(aggregator)
+          agg = Aggregator::Base.klass(aggregator)
           @columns[name] = { :pos => pos, :aggregator => agg, :conversion => conversion }
           define_method(name)
         end
@@ -39,7 +39,7 @@ module LogfileInterval
       end
     end
 
-    def add_record(record)
+    def add(record)
       @aggregators.each do |name, agg|
         agg.add_record(record)
       end
@@ -84,13 +84,19 @@ module LogfileInterval
   end
 
   module Aggregator
-    def self.klass(aggregator)
-      case aggregator
-      when :sum then Sum
+    class Base
+      def self.register(name, klass)
+        @aggregator_classes[name] = klass
+      end
+
+      def self.klass(name)
+        @aggregator_classes.fetch(name)
       end
     end
 
-    class Sum
+    class Sum < Base
+      register :sum, self
+
       def initialize
         @val = 0
       end
@@ -100,7 +106,7 @@ module LogfileInterval
       end
     end
 
-    class Count
+    class Count < Base
       def initialize
         @val = Counter.new
       end

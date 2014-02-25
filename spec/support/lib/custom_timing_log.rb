@@ -1,6 +1,8 @@
 module LogfileInterval
   module Aggregator
     class CountOverThreshold < Base
+      register_aggregator :count_over_threshold, self
+
       def initialize(options)
         super
         @threshold = options.fetch(:threshold)
@@ -21,8 +23,8 @@ module LogfileInterval
 
       add_column :name => :timestamp,    :pos => 1, :aggregator => :timestamp
       add_column :name => :ip,           :pos => 2, :aggregator => :count
-      add_column :name => :num_slow,     :pos => 4, :aggregator => :custom,    :conversion => :integer,
-                 :custom_class => Aggregator::CountOverThreshold, :custom_options => { :threshold => 100 }
+      add_column :name => :num_slow,     :pos => 4, :aggregator => :count_over_threshold,    :conversion => :integer,
+                 :custom_options => { :threshold => 100 }
 
       def time
         Time.at(self.timestamp.to_i)

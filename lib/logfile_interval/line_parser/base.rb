@@ -1,7 +1,5 @@
 module LogfileInterval
   module LineParser
-    AGGREGATION_FUNCTIONS = [ :sum, :average, :timestamp, :count, :delta, :custom ]
-
     class ConfigurationError  < StandardError; end
 
     class Base
@@ -53,7 +51,6 @@ module LogfileInterval
 
         def set_column_custom_options(column_name, options)
           raise ArgumentError, "Invalid column name: #{column_name}" unless columns.has_key?(column_name)
-          raise ArgumentError, "This column is not custom: #{column_name}" unless columns[column_name].has_key?(:custom_class)
           columns[column_name][:custom_options] = options
         end
 
@@ -68,11 +65,8 @@ module LogfileInterval
           validate_option(options, :name)
           validate_option(options, :pos)
           validate_option(options, :aggregator)
-          unless AGGREGATION_FUNCTIONS.include?(options[:aggregator])
-            raise ConfigurationError, "aggregator must be one of #{AGGREGATION_FUNCTIONS.join(', ')}"
-          end
-          if options[:aggregator] == :custom
-            validate_option(options, :custom_class, ':custom_class must be set for :custom aggregator type')
+          unless Aggregator::Base.exist?(options[:aggregator]) || options[:aggregator] == :timestamp
+            raise ConfigurationError, "aggregator must be one of #{Aggregator::Base.all.join(', ')}"
           end
         end
 
@@ -90,10 +84,7 @@ module LogfileInterval
             end
           end
           options[:conversion] = options.fetch(:conversion, :string)
-          if options[:aggregator] == :custom
-            options[:custom_options] = options.fetch(:custom_options, {})
-          end
-          options[:aggregator_class] = Aggregator.klass(options)
+          options[:aggregator_class] = Aggregator::Base.klass(options[:aggregator])
           options.delete(:aggregator)
           options
         end
