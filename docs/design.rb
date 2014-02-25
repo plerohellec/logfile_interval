@@ -20,6 +20,10 @@ module LogfileInterval
           data = {}
           data = f(match_data)
         end
+
+        def each(&block)
+          columns.each(&block)
+        end
       end
     end
 

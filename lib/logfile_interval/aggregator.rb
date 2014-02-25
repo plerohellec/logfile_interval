@@ -3,7 +3,6 @@ lib_dir = File.expand_path('..', __FILE__)
 require "#{lib_dir}/aggregator/base"
 require "#{lib_dir}/aggregator/sum"
 require "#{lib_dir}/aggregator/count"
-require "#{lib_dir}/aggregator/group_and_count"
 require "#{lib_dir}/aggregator/average"
 require "#{lib_dir}/aggregator/delta"
 
@@ -13,12 +12,7 @@ module LogfileInterval
       case options[:aggregator]
       when :sum               then Sum
       when :average           then Average
-      when :count
-        if options[:group_by] && options[:group_by] != options[:name]
-          GroupAndCount
-        else
-          Count
-        end
+      when :count             then Count
       when :delta             then Delta
       when :custom            then options.fetch(:custom_class)
       end

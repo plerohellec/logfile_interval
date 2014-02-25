@@ -67,14 +67,14 @@ module LogfileInterval
           @interval.size.should == 1
           @interval[:total_time].should == 100
           @interval[:num_bytes].should == 20000
-          @interval[:action].should == 1
-          @interval[:ip].should == 1
+          @interval[:action].should == {"posts#index"=>1}
+          @interval[:ip].should == {"192.168.0.5"=>1}
         end
       end
 
       context 'with count and group by options' do
         it 'creates an aggregator of type GroupAndCount' do
-          expect(Aggregator::GroupAndCount).to receive(:new)
+          expect(Aggregator::Count).to receive(:new).twice
           interval = Interval.new(@end_time, @length, LineParser::TimingLogWithGrouping.columns)
         end
 
@@ -115,8 +115,8 @@ module LogfileInterval
         end
 
         it 'counts columns with group aggregator' do
-          @interval[:ip].should == 3
-          @interval[:action].should == 3
+          @interval[:ip].should ==  { '192.168.0.5' => 2, '10.10.10.10' => 1 }
+          @interval[:action].should == { 'posts#index' => 1, 'posts#show' => 2}
         end
       end
 

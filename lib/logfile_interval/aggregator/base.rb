@@ -1,9 +1,23 @@
 module LogfileInterval
   module Aggregator
     class Base
+
+      class << self
+        def aggregator_classes
+          @aggregator_classes ||= {}
+        end
+
+        def register_aggregator(name, klass)
+          aggregator_classes[name] = klass
+        end
+      end
+
       include Enumerable
 
+      attr_reader :name
+
       def initialize(options = {})
+        @name = options[:name]
         @val = Util::Counter.new
         @size = Util::Counter.new
         @options = options
@@ -21,11 +35,12 @@ module LogfileInterval
         end
       end
 
-      def add(value, group_by = nil)
+      def add(value, group_by_value = nil)
         raise NotImplementedError
       end
 
       private
+
       def key(group_by = nil)
         group_by ? group_by : :all
       end

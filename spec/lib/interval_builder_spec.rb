@@ -31,8 +31,8 @@ module LogfileInterval
           @intervals.first[:total_time].should == 700.0/4
           @intervals.first[:num_bytes].should == 52000
           @intervals.first[:rss].round(5).should == 0.60
-          @intervals.first[:ip].should == 4
-          @intervals.first[:action].should == 4
+          @intervals.first[:ip].should == {"192.168.0.5"=>3, "192.168.0.10"=>1}
+          @intervals.first[:action].should == {"posts#show"=>2, "posts#create"=>1, "posts#index"=>1}
         end
       end
 
@@ -43,8 +43,8 @@ module LogfileInterval
           @intervals.last[:total_time].should == 300
           @intervals.last[:num_bytes].should == 41000
           @intervals.last[:rss].round(5).should == 0.20
-          @intervals.last[:ip].should == 2
-          @intervals.last[:action].should == 2
+          @intervals.last[:ip].should == {"192.168.0.10"=>1, "192.168.0.5"=>1}
+          @intervals.last[:action].should == {"posts#index"=>1, "posts#show"=>1}
         end
       end
 

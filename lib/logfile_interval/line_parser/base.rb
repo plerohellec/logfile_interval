@@ -83,7 +83,11 @@ module LogfileInterval
         def sanitize_column_options(options)
           options[:name]       = options[:name].to_sym
           if options.has_key?(:group_by)
-            options[:group_by]   = options[:group_by].to_sym
+            if options[:group_by].to_sym != options[:name]
+              options[:group_by] = options[:group_by].to_sym
+            else
+              options.delete(:group_by)
+            end
           end
           options[:conversion] = options.fetch(:conversion, :string)
           if options[:aggregator] == :custom

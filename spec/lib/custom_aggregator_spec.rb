@@ -24,7 +24,7 @@ module LogfileInterval
 
       @interval.size.should == 3
       @interval[:num_slow].should == 1
-      @interval[:ip].should == 3
+      @interval[:ip].should == {"192.168.0.5"=>2, "10.10.10.10"=>1}
     end
 
     describe 'set_column_custom_options' do
@@ -34,7 +34,7 @@ module LogfileInterval
 
         @interval.size.should == 3
         @interval[:num_slow].should == 2
-        @interval[:ip].should == 3
+        @interval[:ip].should == {"192.168.0.5"=>2, "10.10.10.10"=>1}
       end
     end
   end

@@ -10,7 +10,7 @@ module LogfileInterval
         Aggregator.klass({ :aggregator => :sum}).should == Sum
         Aggregator.klass({ :aggregator => :average}).should == Average
         Aggregator.klass({ :aggregator => :count}).should == Count
-        Aggregator.klass({ :aggregator => :count, :group_by => :foo}).should == GroupAndCount
+        Aggregator.klass({ :aggregator => :count, :group_by => :foo}).should == Count
         Aggregator.klass({ :aggregator => :delta}).should == Delta
         Aggregator.klass({ :aggregator => :custom, :custom_class => CustomAggregator}).should == CustomAggregator
       end
@@ -104,7 +104,8 @@ module LogfileInterval
           g.add('500')
           g.add('301')
           g.add('200')
-          g.value.should == 4
+          g.value.should == 0
+          g.values.size.should == 3
         end
       end
     end
@@ -145,20 +146,18 @@ module LogfileInterval
       describe Count do
         it 'groups values and increment counters' do
           g = Count.new
-          g.add('200', '200')
-          g.add('500', '500')
-          g.add('301', '301')
-          g.add('200', '200')
+          g.add('200')
+          g.add('500')
+          g.add('301')
+          g.add('200')
           g.values.should be_a(Hash)
           g.values.should include({'200' => 2})
           g.values.should include({'301' => 1})
           g.values.should include({'500' => 1})
         end
-      end
 
-      describe GroupAndCount do
         it 'each yields a key and a hash' do
-          gac = GroupAndCount.new
+          gac = Count.new
           gac.add :key1, :subkey1
           gac.first.should be_an(Array)
           gac.first.size.should == 2
@@ -167,11 +166,7 @@ module LogfileInterval
 
         context :add do
           before :each do
-            @gac = GroupAndCount.new
-          end
-
-          it 'requires a group_by argument' do
-            lambda { @gac.add('foo') }.should raise_error ArgumentError
+            @gac = Count.new
           end
 
           it 'counts number of occurence of subkey for key' do

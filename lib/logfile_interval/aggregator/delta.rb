@@ -1,6 +1,8 @@
 module LogfileInterval
   module Aggregator
     class Delta < Base
+      register_aggregator :delat, self
+
       def initialize
         @previous = Util::Counter.new
         super
