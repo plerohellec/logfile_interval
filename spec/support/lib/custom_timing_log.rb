@@ -1,8 +1,6 @@
 module LogfileInterval
   module Aggregator
     class CountOverThreshold < Base
-      register_aggregator :count_over_threshold, self
-
       def initialize(options)
         super
         @threshold = options.fetch(:threshold)

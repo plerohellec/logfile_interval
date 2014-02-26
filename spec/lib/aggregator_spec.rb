@@ -3,8 +3,10 @@ require 'spec_helper'
 module LogfileInterval
 
   module Aggregator
-    class CustomAggregator < Base
-      register_aggregator :custom_aggregator, self
+    class CustomAggregator < Base; end
+
+    class BizarroAggregator < Base
+      register_aggregator :weird_add, self
     end
       
     describe Base do
@@ -14,6 +16,7 @@ module LogfileInterval
         Aggregator::Base.klass(:count).should == Count
         Aggregator::Base.klass(:delta).should == Delta
         Aggregator::Base.klass(:custom_aggregator).should == CustomAggregator
+        Aggregator::Base.klass(:weird_add).should == BizarroAggregator
       end
     end
 

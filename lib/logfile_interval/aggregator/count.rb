@@ -1,8 +1,6 @@
 module LogfileInterval
   module Aggregator
     class Count < Base
-      register_aggregator :count, self
-
       def each
         @val.each { |k, v| yield k, v }
       end

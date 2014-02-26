@@ -3,11 +3,19 @@ module LogfileInterval
     class Base
 
       class << self
+        def inherited(subclass)
+          name = subclass.to_s
+          name = $1 if name =~ /(\w+)$/
+          name = name.scan(/[A-Z][a-z]*/).join("_").downcase.to_sym
+          aggregator_classes[name] = subclass
+        end
+
         def aggregator_classes
           @@aggregator_classes ||= {}
         end
 
         def register_aggregator(name, klass)
+          puts "register #{klass}"
           aggregator_classes[name] = klass
         end
 
@@ -82,6 +90,5 @@ end
 current_dir = File.expand_path('..', __FILE__)
 agg_files = Dir.glob("#{current_dir}/*.rb").reject { |file| file =~ /base.rb/ }
 agg_files.each do |agg_file|
-  puts "requiring #{agg_file}"
   require agg_file
 end
