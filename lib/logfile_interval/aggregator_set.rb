@@ -5,11 +5,7 @@ module LogfileInterval
       @aggregators = {}
       parser_columns.each do |name, options|
         next unless klass = options[:aggregator_class]
-        if custom_options = options[:custom_options]
-          @aggregators[name.to_sym] = klass.new(custom_options)
-        else
-          @aggregators[name.to_sym] = klass.new
-        end
+        @aggregators[name.to_sym] = klass.new(options.fetch(:custom_options, {}))
       end
     end
 

@@ -1,7 +1,7 @@
 module LogfileInterval
   module Aggregator
     class Delta < Base
-      def initialize
+      def initialize(options = {})
         @previous = Util::Counter.new
         super
       end

@@ -4,7 +4,6 @@ module LogfileInterval
     attr_reader   :size
 
     class OutOfRange < StandardError; end
-    class ParserMismatch < StandardError; end
 
     def initialize(end_time, length, parser_columns)
       raise ArgumentError, 'end_time must be round' unless (end_time.to_i % length.to_i == 0)
