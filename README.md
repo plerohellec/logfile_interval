@@ -1,4 +1,4 @@
-# LogfileInterval [![Build Status](https://travis-ci.org/plerohellec/logfile_interval.png?branch=master)](https://travis-ci.org/plerohellec/logfile_interval)
+# LogfileInterval [![Build Status](https://travis-ci.org/plerohellec/logfile_interval.png?branch=master)](https://travis-ci.org/plerohellec/logfile_interval) [![Code Climate](https://codeclimate.com/github/plerohellec/logfile_interval.png)](https://codeclimate.com/github/plerohellec/logfile_interval)
 
 Logfile parser and aggregator.
 
