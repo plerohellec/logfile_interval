@@ -17,10 +17,7 @@ module LogfileInterval
 
       parsed_lines_enum.each do |record|
         next if record.time > current_interval.end_time
-        while record.time <= current_interval.start_time
-          yield current_interval
-          current_interval = Interval.new(current_interval.start_time, length, parser_columns)
-        end
+        current_interval = move_over_empty_intervals(current_interval, record) { |interval| yield interval }
         current_interval.add_record(record)
       end
 
@@ -31,6 +28,16 @@ module LogfileInterval
       each_interval do |interval|
         return interval
       end
+    end
+
+    private
+
+    def move_over_empty_intervals(current_interval, record)
+      while record.time <= current_interval.start_time
+        yield current_interval
+        current_interval = Interval.new(current_interval.start_time, length, parser_columns)
+      end
+      current_interval
     end
   end
 end
