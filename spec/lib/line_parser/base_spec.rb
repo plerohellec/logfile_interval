@@ -3,7 +3,7 @@ require 'spec_helper'
 module LogfileInterval
   data_dir = File.join(File.dirname(__FILE__), '..', 'support/logfiles')
 
-  module LineParser
+  module ParsedLine
 
     describe Base do
       before :each do

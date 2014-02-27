@@ -7,7 +7,7 @@ module LogfileInterval
   describe LogfileSet do
     before :each do
       @logfiles = ["#{data_dir}/access.log.2", "#{data_dir}/access.log.1"]
-      @set = LogfileSet.new(@logfiles, LineParser::AccessLog)
+      @set = LogfileSet.new(@logfiles, ParsedLine::AccessLog)
       @first_line = '66.249.67.176 - - [23/Jun/2013:17:00:01 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 185 "-" "Google"'
       @second_line = '12.24.48.96 - - [23/Jun/2013:16:59:00 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 4555 "-" "Bing)"'
       @last_line  = '12.24.48.96 - - [23/Jun/2013:16:49:00 -0800] "GET /package/core/raring/universe/proposed/bash HTTP/1.1" 200 4555 "-" "Bing)"'
@@ -41,7 +41,7 @@ module LogfileInterval
       context :order do
         it 'iterates backward when order is :desc' do
           lines = []
-          set = LogfileSet.new(@logfiles, LineParser::AccessLog, :desc)
+          set = LogfileSet.new(@logfiles, ParsedLine::AccessLog, :desc)
           set.each_line do |line|
             lines << line
           end
@@ -51,7 +51,7 @@ module LogfileInterval
 
         it 'iterates upward when order is :asc' do
           lines = []
-          set = LogfileSet.new(@logfiles, LineParser::AccessLog, :asc)
+          set = LogfileSet.new(@logfiles, ParsedLine::AccessLog, :asc)
           set.each_line do |line|
             lines << line
           end

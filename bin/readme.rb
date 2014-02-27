@@ -4,7 +4,7 @@ require 'pp'
 require 'date'
 require File.join(File.expand_path('../../lib', __FILE__), 'logfile_interval')
 
-class AccessLogParser < LogfileInterval::LineParser::Base
+class AccessLogParsedLine < LogfileInterval::ParsedLine::Base
   # Example line:
   # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
 
@@ -21,14 +21,14 @@ class AccessLogParser < LogfileInterval::LineParser::Base
 end
 
 path = ENV['ACCESS_LOG_PATH']
-file = LogfileInterval::Logfile.new(path, AccessLogParser)
+file = LogfileInterval::Logfile.new(path, AccessLogParsedLine)
 unless file.exist?
   puts "#{path} is not found"
   exit 1
 end
 parsed_line_enum = file.each_parsed_line
 
-builder = LogfileInterval::IntervalBuilder.new(parsed_line_enum, AccessLogParser, 300)
+builder = LogfileInterval::IntervalBuilder.new(parsed_line_enum, AccessLogParsedLine, 300)
 builder.each_interval do |interval|
   next unless interval.size > 0
 

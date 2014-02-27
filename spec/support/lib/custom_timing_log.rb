@@ -12,7 +12,7 @@ module LogfileInterval
     end
   end
 
-  module LineParser
+  module ParsedLine
     class CustomTimingLog < Base
       # Line format:
       # timestamp, ip, controller#action, total_time, bytes, rss

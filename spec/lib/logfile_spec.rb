@@ -6,7 +6,7 @@ module LogfileInterval
 
   describe Logfile do
     before :each do
-      @alf = Logfile.new("#{data_dir}/access.log", LineParser::AccessLog)
+      @alf = Logfile.new("#{data_dir}/access.log", ParsedLine::AccessLog)
       @first_line = '78.54.172.146 - - [01/Jan/2012:16:30:51 -0800] "GET /package/core/oneiric/main/base/abrowser-6.0  HTTP/1.1" 200 6801 "http://www.google.com/url?sa=t&rct=j&q=abrowser 6.0&esrc=s&source=web&cd=4&sqi=2&ved=0CDYQFjAD&url=http%3A%2F%2Fwww.ubuntuupdates.org%2Fpackages%2Fshow%2F268762&ei=s-QlT8vJFon1sgb54unBDg&usg=AFQjCNHCHC0bxTf6aXAfUwT6Erjta6WLaQ&sig2=ceCi1odtaB8Vcf6IWg2a3w" "Mozilla/5.0 (Ubuntu; X11; Linux x86_64; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"'
       @second_line = '78.54.172.146 - - [01/Jan/2012:16:30:51 -0800] "GET /package/show/2  HTTP/1.1" 302 6801 "http://www.google.com/url?sa=t&rct=j&q=abrowser 6.0&esrc=s&source=web&cd=4&sqi=2&ved=0CDYQFjAD&url=http%3A%2F%2Fwww.ubuntuupdates.org%2Fpackages%2Fshow%2F268762&ei=s-QlT8vJFon1sgb54unBDg&usg=AFQjCNHCHC0bxTf6aXAfUwT6Erjta6WLaQ&sig2=ceCi1odtaB8Vcf6IWg2a3w" "Mozilla/5.0 (Ubuntu; X11; Linux x86_64; rv:9.0.1) Gecko/20100101 Firefox/9.0.1"'
       @last_line = '66.249.67.176 - - [01/Jan/2012:00:57:47 -0800] "GET /packages/show/1 HTTP/1.1" 301 185 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"'
@@ -41,7 +41,7 @@ module LogfileInterval
       context :order do
         it 'iterates backward when order is :desc' do
           lines = []
-          lf = Logfile.new("#{data_dir}/access.log", LineParser::AccessLog, :desc)
+          lf = Logfile.new("#{data_dir}/access.log", ParsedLine::AccessLog, :desc)
           lf.each_line do |line|
             lines << line
           end
@@ -51,7 +51,7 @@ module LogfileInterval
 
         it 'iterates upward when order is :asc' do
           lines = []
-          lf = Logfile.new("#{data_dir}/access.log", LineParser::AccessLog, :asc)
+          lf = Logfile.new("#{data_dir}/access.log", ParsedLine::AccessLog, :asc)
           lf.each_line do |line|
             lines << line
           end

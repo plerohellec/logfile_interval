@@ -1,5 +1,5 @@
 module LogfileInterval
-  module LineParser
+  module ParsedLine
     class ConfigurationError  < StandardError; end
 
     class Base

@@ -10,7 +10,7 @@ unless File.exist?(String(logfile))
   exit 1
 end
 
-class AccessLogParser < LogfileInterval::LineParser::Base
+class AccessLogParsedLine < LogfileInterval::ParsedLine::Base
   # Example line:
   # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.22 (KHTML, like Gecko) Ubuntu Chromium/25.0.1364.160 Chrome/25.0.1364.160 Safari/537.22"
 
@@ -29,8 +29,8 @@ class AccessLogParser < LogfileInterval::LineParser::Base
   end
 end
 
-file = LogfileInterval::Logfile.new(logfile, AccessLogParser)
-builder = LogfileInterval::IntervalBuilder.new(file.each_parsed_line, AccessLogParser, 300)
+file = LogfileInterval::Logfile.new(logfile, AccessLogParsedLine)
+builder = LogfileInterval::IntervalBuilder.new(file.each_parsed_line, AccessLogParsedLine, 300)
 builder.each_interval do |interval|
   next unless interval.size > 0
 

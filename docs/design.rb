@@ -164,7 +164,7 @@ end
 logfiles = [ 'access.log', 'access.log.1', 'access.log.2' ]
 logfile = logfiles.first
 
-parser = LineParser::AccessLogParser.new
+parser = ParsedLine::AccessLogParser.new
 
 logfile_iterator = LogfileInterval::Logfile.new(logfile, parser)
 logfile_iterator.each_line do |line|
@@ -172,16 +172,16 @@ logfile_iterator.each_line do |line|
   puts line
 end
 
-parser = LineParser::AccessLog
+parser = ParsedLine::AccessLog
 logfile_iterator.each_parsed_line do |record|
-  puts record.class # LineParser::AccessLog
+  puts record.class # ParsedLine::AccessLog
   puts record.ip
   puts record.time
 end
 
 set = LogfileInterval::LogfileSet.new(logfiles, parser)
 set.each_parsed_line do |record|
-  puts record.class # LineParser::AccessLog
+  puts record.class # ParsedLine::AccessLog
 end
 
 length = 5.minutes

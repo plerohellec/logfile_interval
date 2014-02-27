@@ -6,7 +6,7 @@ module LogfileInterval
     before :each do
       @end_time = Time.new(2013, 12, 01, 16, 00, 00, '-08:00')
       @length = 300
-      @line_parser_class = LineParser::CustomTimingLog
+      @line_parser_class = ParsedLine::CustomTimingLog
     end
 
     def fill_interval

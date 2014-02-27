@@ -7,8 +7,8 @@ module LogfileInterval
   describe IntervalBuilder do
     before :each do
       @logfiles = ["#{data_dir}/timing.log", "#{data_dir}/timing.log.1" ]
-      @set = LogfileSet.new(@logfiles, LineParser::TimingLog)
-      @builder = IntervalBuilder.new(@set.each_parsed_line, LineParser::TimingLog, 300)
+      @set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
+      @builder = IntervalBuilder.new(@set.each_parsed_line, ParsedLine::TimingLog, 300)
     end
 
     context :each_interval do

@@ -11,7 +11,7 @@ module LogfileInterval
     end
 
     it 'gets instantiated with empty data' do
-      interval = Interval.new(@end_time, @length, LineParser::TimingLog.columns)
+      interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
       interval.size.should == 0
       interval[:total_time].should == 0
       interval[:num_bytes].should == 0
@@ -21,20 +21,20 @@ module LogfileInterval
 
     context :to_hash do
       it 'returns a hash' do
-        interval = Interval.new(@end_time, @length, LineParser::TimingLog)
+        interval = Interval.new(@end_time, @length, ParsedLine::TimingLog)
         interval.to_hash.should be_a(Hash)
       end
 
       it 'has a key for all columns' do
-        record   = LineParser::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 2000, 53.0')
-        interval = Interval.new(@end_time, @length, LineParser::TimingLog.columns)
+        record   = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 2000, 53.0')
+        interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         interval.add_record(record)
         hinterval = interval.to_hash
         hinterval.keys.should include(:ip, :total_time, :action, :num_bytes, :rss)
       end
 
       it 'with no data, should have keys with 0 values' do
-        interval = Interval.new(@end_time, @length, LineParser::TimingLog.columns)
+        interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         hinterval = interval.to_hash
         hinterval[:ip].should == 0
         hinterval[:action].should == 0
@@ -47,21 +47,21 @@ module LogfileInterval
     context :add_record do
       context 'basics' do
         before :each do
-          @interval = Interval.new(@end_time, @length, LineParser::TimingLog.columns)
+          @interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         end
 
         it 'rejects record out of interval' do
-          oor_record = LineParser::TimingLog.create_record('1385942450, 192.168.0.5, posts#index, 100, 20000, 50.0')
+          oor_record = ParsedLine::TimingLog.create_record('1385942450, 192.168.0.5, posts#index, 100, 20000, 50.0')
           lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
         end
 
         it 'rejects record at interval start_time' do
-          oor_record = LineParser::TimingLog.create_record('1385942100, 192.168.0.5, posts#index, 100, 20000, 50.0')
+          oor_record = ParsedLine::TimingLog.create_record('1385942100, 192.168.0.5, posts#index, 100, 20000, 50.0')
           lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
         end
 
         it 'adds 1 record to interval' do
-          record1 = LineParser::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 50.0')
+          record1 = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 50.0')
           @interval.add_record(record1)
 
           @interval.size.should == 1
@@ -75,12 +75,12 @@ module LogfileInterval
       context 'with count and group by options' do
         it 'creates an aggregator of type GroupAndCount' do
           expect(Aggregator::Count).to receive(:new).twice
-          interval = Interval.new(@end_time, @length, LineParser::TimingLogWithGrouping.columns)
+          interval = Interval.new(@end_time, @length, ParsedLine::TimingLogWithGrouping.columns)
         end
 
         it 'add_record accepts key and subkey' do
-          interval = Interval.new(@end_time, @length, LineParser::TimingLogWithGrouping.columns)
-          record1 = LineParser::TimingLogWithGrouping.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 53.0')
+          interval = Interval.new(@end_time, @length, ParsedLine::TimingLogWithGrouping.columns)
+          record1 = ParsedLine::TimingLogWithGrouping.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 53.0')
           interval.add_record(record1)
           interval.size.should == 1
         end
@@ -88,13 +88,13 @@ module LogfileInterval
 
       context 'with 3 records' do
         before :each do
-          @interval = Interval.new(@end_time, @length, LineParser::TimingLog.columns)
+          @interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
 
-          record1 = LineParser::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 53.0')
+          record1 = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 53.0')
           @interval.add_record(record1)
-          record2 = LineParser::TimingLog.create_record('1385942300, 192.168.0.5, posts#show, 50, 10000, 51.0')
+          record2 = ParsedLine::TimingLog.create_record('1385942300, 192.168.0.5, posts#show, 50, 10000, 51.0')
           @interval.add_record(record2)
-          record3 = LineParser::TimingLog.create_record('1385942200, 10.10.10.10, posts#show, 60, 12000, 50.0')
+          record3 = ParsedLine::TimingLog.create_record('1385942200, 10.10.10.10, posts#show, 60, 12000, 50.0')
           @interval.add_record(record3)
         end
 
@@ -122,15 +122,15 @@ module LogfileInterval
 
       context 'with group_by key' do
         before :each do
-          @interval = Interval.new(@end_time, @length, LineParser::TimingLogWithGrouping.columns)
+          @interval = Interval.new(@end_time, @length, ParsedLine::TimingLogWithGrouping.columns)
 
-          record1 = LineParser::TimingLogWithGrouping.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 53.0')
+          record1 = ParsedLine::TimingLogWithGrouping.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 53.0')
           @interval.add_record(record1)
-          record2 = LineParser::TimingLogWithGrouping.create_record('1385942300, 192.168.0.5, posts#show, 50, 10000, 51.0')
+          record2 = ParsedLine::TimingLogWithGrouping.create_record('1385942300, 192.168.0.5, posts#show, 50, 10000, 51.0')
           @interval.add_record(record2)
-          record3 = LineParser::TimingLogWithGrouping.create_record('1385942200, 192.168.0.5, posts#show, 60, 12000, 50.0')
+          record3 = ParsedLine::TimingLogWithGrouping.create_record('1385942200, 192.168.0.5, posts#show, 60, 12000, 50.0')
           @interval.add_record(record3)
-          record4 = LineParser::TimingLogWithGrouping.create_record('1385942180, 10.10.10.10, posts#index, 100, 20000, 48.0')
+          record4 = ParsedLine::TimingLogWithGrouping.create_record('1385942180, 10.10.10.10, posts#index, 100, 20000, 48.0')
           @interval.add_record(record4)
         end
 

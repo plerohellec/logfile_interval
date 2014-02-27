@@ -1,7 +1,7 @@
 module LogfileInterval
   data_dir = File.join(File.dirname(__FILE__), '..', 'support/logfiles')
 
-  module LineParser
+  module ParsedLine
 
     class AccessLog < Base
       # Example line:
