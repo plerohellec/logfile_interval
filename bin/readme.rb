@@ -10,9 +10,9 @@ class AccessLogParsedLine < LogfileInterval::ParsedLine::Base
 
   set_regex /^([\d\.]+)\s+.*\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+/
 
-  add_column :name => 'ip',           :pos => 1, :aggregator => :count,     :group_by => 'ip'
+  add_column :name => 'ip',           :pos => 1, :aggregator => :count
   add_column :name => 'timestamp',    :pos => 2, :aggregator => :timestamp
-  add_column :name => 'code',         :pos => 4, :aggregator => :count,     :group_by => 'code'
+  add_column :name => 'code',         :pos => 4, :aggregator => :count
   add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
 
   def time

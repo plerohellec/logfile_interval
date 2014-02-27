@@ -40,6 +40,7 @@ module LogfileInterval
         end
       end
     end
+    alias_method :each, :each_parsed_line
 
     def each_line
       return enum_for(:each_line) unless block_given?

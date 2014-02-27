@@ -11,7 +11,28 @@ module LogfileInterval
       @builder = IntervalBuilder.new(@set.each_parsed_line, ParsedLine::TimingLog, 300)
     end
 
-    context :each_interval do
+    it 'accepts a logfile as the parsed_lines_enum argument' do
+      logfile = Logfile.new("#{data_dir}/timing.log", ParsedLine::TimingLog)
+      builder = IntervalBuilder.new(logfile, ParsedLine::TimingLog, 300)
+      Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
+      intervals = []
+      builder.each_interval do |interval|
+        intervals << interval
+      end
+      intervals.size.should == 1
+    end
+
+    it 'accepts a logfile_set as the parsed_lines_enum argument' do
+      builder = IntervalBuilder.new(@set, ParsedLine::TimingLog, 300)
+      Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
+      intervals = []
+      builder.each_interval do |interval|
+        intervals << interval
+      end
+      intervals.size.should == 2
+    end
+
+    describe :each_interval do
       before :each do
         Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
         @intervals = []
@@ -57,7 +78,7 @@ module LogfileInterval
       end
     end
 
-    context :last_interval do
+    describe :last_interval do
       it 'returns the most recent interval' do
         Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
         interval = @builder.last_interval

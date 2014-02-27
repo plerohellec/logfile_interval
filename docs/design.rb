@@ -1,33 +1,37 @@
 module LogfileInterval
-  module Parser
-    class Base
-      class << self
-        def columns
-          @columns ||= {}
-        end
+  module ParsedLine
 
-        def set_regex
-        end
+    module Parser
+      def columns
+        @columns ||= {}
+      end
 
-        def add_column
-          agg = Aggregator::Base.klass(aggregator)
-          @columns[name] = { :pos => pos, :aggregator => agg, :conversion => conversion }
-          define_method(name)
-        end
+      def set_regex
+      end
 
-        def create_parsed_line(line)
-          match_data = regex.match(line)
-          data = {}
-          data = f(match_data)
-        end
+      def add_column
+        agg = Aggregator::Base.klass(aggregator)
+        @columns[name] = { :pos => pos, :aggregator => agg, :conversion => conversion }
+        define_method(name)
+      end
 
-        def each(&block)
-          columns.each(&block)
-        end
+      def parse(line)
+        match_data = regex.match(line)
+        data = {}
+        data = f(match_data)
+      end
+
+      def each(&block)
+        columns.each(&block)
       end
     end
 
-    class ParsedLine
+    class Base
+      extend Parser
+
+      def initialize(line)
+        @data = self.class.parse(line)
+      end
     end
   end
 
@@ -68,12 +72,12 @@ module LogfileInterval
   end
 
   class IntervalBuilder
-    def initialize(parsed_line_enum, parser_columns, length)
+    def initialize(parsed_lines_enum, parser_columns, length)
     end
 
     def each_interval
       interval = Interval.new(now, length, parser_columns)
-      parsed_line_enum.each do |record|
+      parsed_lines_enum.each do |record|
         while record.time < interval.start_time do
           yield interval
           interval = Interval.new(interval.start_time, length, aggregators)
@@ -155,7 +159,7 @@ module LogfileInterval
   end
 end
 
-class AccessLogParser < LogfileInterval::Parse::Base
+class AccessLogParsedLine < LogfileInterval::Parse::Base
   set_regex /blah/
   add_column :name => :foo, :pos => 1, :conversion => integer, :aggregator => :average
 end
@@ -164,7 +168,7 @@ end
 logfiles = [ 'access.log', 'access.log.1', 'access.log.2' ]
 logfile = logfiles.first
 
-parser = ParsedLine::AccessLogParser.new
+parser = AccessLogParsedLine
 
 logfile_iterator = LogfileInterval::Logfile.new(logfile, parser)
 logfile_iterator.each_line do |line|
@@ -172,7 +176,6 @@ logfile_iterator.each_line do |line|
   puts line
 end
 
-parser = ParsedLine::AccessLog
 logfile_iterator.each_parsed_line do |record|
   puts record.class # ParsedLine::AccessLog
   puts record.ip

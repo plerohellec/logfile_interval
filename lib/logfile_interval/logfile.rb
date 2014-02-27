@@ -46,6 +46,7 @@ module LogfileInterval
         yield record if record
       end
     end
+    alias_method :each, :each_parsed_line
 
     private
     def each_line_descending
