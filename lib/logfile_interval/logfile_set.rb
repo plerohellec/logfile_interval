@@ -30,24 +30,23 @@ module LogfileInterval
       end
     end
 
-    def each_parsed_line
-      return enum_for(:each_parsed_line) unless block_given?
-
-      ordered_filenames.each do |filename|
-        tfile = Logfile.new(filename, parser, @order)
-        tfile.each_parsed_line do |record|
-          yield record
-        end
-      end
+    def each_parsed_line(&block)
+      return enum_for(__method__) unless block_given?
+      each_by_method(__method__, &block)
     end
     alias_method :each, :each_parsed_line
 
-    def each_line
-      return enum_for(:each_line) unless block_given?
+    def each_line(&block)
+      return enum_for(__method__) unless block_given?
+      each_by_method(__method__, &block)
+    end
 
+    private
+
+    def each_by_method(method, &block)
       ordered_filenames.each do |filename|
         tfile = Logfile.new(filename, parser, @order)
-        tfile.each_line do |line|
+        tfile.send(method) do |line|
           yield line
         end
       end
