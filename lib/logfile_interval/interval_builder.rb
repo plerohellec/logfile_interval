@@ -33,12 +33,17 @@ module LogfileInterval
 
 
       parsed_lines_enum.each do |record|
+        unless current_interval
+          rounded_end_time = interval_end_time(record.time)
+          current_interval = Interval.new(rounded_end_time, length, parser_columns)
+        end
+
+
       end
     end
 
     def each_interval_descending
-      secs = (Time.now.to_i / length.to_i) * length.to_i
-      rounded_end_time = Time.at(secs)
+      rounded_end_time = interval_end_time(Time.now)
       current_interval = Interval.new(rounded_end_time, length, parser_columns)
 
       parsed_lines_enum.each do |record|
@@ -50,9 +55,9 @@ module LogfileInterval
       yield current_interval if current_interval.size>0
     end
 
-    def interval_end_time(time)
-      secs = (time.to_i / length.to_i) * length.to_i
-      rounded_end_time = Time.at(secs)
+    def interval_end_time(t)
+      secs = (t.to_i / length.to_i) * length.to_i
+      Time.at(secs)
     end
 
     def order
