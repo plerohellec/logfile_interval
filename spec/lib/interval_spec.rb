@@ -60,6 +60,11 @@ module LogfileInterval
           lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
         end
 
+        it 'accepts record at interval end_time' do
+          oor_record = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 50.0')
+          lambda { @interval.add_record(oor_record) }.should_not raise_error
+        end
+
         it 'adds 1 record to interval' do
           record1 = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 50.0')
           @interval.add_record(record1)
@@ -73,7 +78,7 @@ module LogfileInterval
       end
 
       context 'with count and group by options' do
-        it 'creates an aggregator of type GroupAndCount' do
+        it 'creates an aggregator of type Count' do
           expect(Aggregator::Count).to receive(:new).twice
           interval = Interval.new(@end_time, @length, ParsedLine::TimingLogWithGrouping.columns)
         end
