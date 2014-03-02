@@ -177,15 +177,27 @@ module LogfileInterval
       end
     end
 
-    describe :last_interval do
-      it 'returns the most recent interval' do
-        Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
-        set = LogfileSet.new(@logfiles, ParsedLine::TimingLog, :desc)
-        builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 300)
-        interval = builder.last_interval
-        interval.end_time.should == Time.new(2013,12,01,16,0,0,'-08:00')
-        interval.size.should == 4
-        interval[:num_bytes].should == 52000
+    describe :first_interval do
+      context 'with parsed_lines_enum in ascending order' do
+        it 'returns the oldest interval' do
+          Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
+          set = LogfileSet.new(@logfiles, ParsedLine::TimingLog, :asc)
+          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 300)
+          interval = builder.first_interval
+          interval.end_time.should == Time.new(2013,12,01,15,55,0,'-08:00')
+          interval.size.should == 2
+        end
+      end
+
+      context 'with parsed_lines_enum in descending order' do
+        it 'returns the most recent interval' do
+          Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
+          set = LogfileSet.new(@logfiles, ParsedLine::TimingLog, :desc)
+          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 300)
+          interval = builder.first_interval
+          interval.end_time.should == Time.new(2013,12,01,16,0,0,'-08:00')
+          interval.size.should == 4
+        end
       end
     end
   end
