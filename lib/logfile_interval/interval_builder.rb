@@ -1,3 +1,6 @@
+require File.join(File.expand_path('..', __FILE__), '/interval_builder/ascending')
+require File.join(File.expand_path('..', __FILE__), '/interval_builder/descending')
+
 module LogfileInterval
   class IntervalBuilder
     attr_reader :parsed_lines_enum, :parser_columns, :length
@@ -6,16 +9,18 @@ module LogfileInterval
       @parsed_lines_enum = parsed_lines_enum
       @parser_columns    = parser_columns
       @length            = length
+
+      case order
+      when :asc  then self.extend Ascending
+      when :desc then self.extend Descending
+      else raise ArgumentError, "Can't determine parsed_lines_enum sort order"
+      end
     end
 
     def each_interval(&block)
       return enum_for(:each_interval) unless block_given?
 
-      current_interval = case order
-      when :asc  then first_interval_ascending(&block)
-      when :desc then first_interval_descending(&block)
-      else raise 'unknown enumerator order'
-      end
+      current_interval = create_first_interval
 
       parsed_lines_enum.each do |record|
         next if out_of_order_record?(current_interval, record)
@@ -33,17 +38,6 @@ module LogfileInterval
     end
 
     private
-
-    def first_interval_ascending
-      first_record = parsed_lines_enum.first
-      interval_end_time = upper_boundary_time(first_record.time)
-      current_interval = Interval.new(interval_end_time, length, parser_columns)
-    end
-
-    def first_interval_descending
-      interval_end_time = lower_boundary_time(Time.now)
-      current_interval = Interval.new(interval_end_time, length, parser_columns)
-    end
 
     def lower_boundary_time(t)
       secs = (t.to_i / length.to_i) * length.to_i
@@ -77,27 +71,6 @@ module LogfileInterval
         current_interval = Interval.new(next_interval_end_time(current_interval), length, parser_columns)
       end
       current_interval
-    end
-
-    def past_current_interval?(current_interval, record)
-      case order
-      when :asc  then record.time  > current_interval.end_time
-      when :desc then record.time <= current_interval.start_time
-      end
-    end
-
-    def out_of_order_record?(current_interval, record)
-      case order
-      when :asc  then record.time <= current_interval.start_time
-      when :desc then record.time  > current_interval.end_time
-      end
-    end
-
-    def next_interval_end_time(current_interval)
-      case order
-      when :asc  then current_interval.end_time + length
-      when :desc then current_interval.end_time - length
-      end
     end
   end
 end
