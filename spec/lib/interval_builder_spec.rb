@@ -47,6 +47,19 @@ module LogfileInterval
         end
       end
 
+      context 'with empty logfiles' do
+        it 'does not yield any interval' do
+          logfiles = ["#{data_dir}/non_existing_timing.log", "#{data_dir}/non_existing_timing.log.1" ]
+          set = LogfileSet.new(logfiles, ParsedLine::TimingLog)
+          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 300)
+          intervals = []
+          builder.each_interval do |interval|
+            intervals << interval
+          end
+          intervals.should be_empty
+        end
+      end
+
       context 'in descending order' do
         before :each do
           Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
@@ -134,10 +147,10 @@ module LogfileInterval
       end
 
       context 'with a gap in the logfiles' do
-          before :each do
-            Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
-            @logfiles = ["#{data_dir}/timing.log", "#{data_dir}/timing.log.1", "#{data_dir}/timing.log.2" ]
-          end
+        before :each do
+          Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
+          @logfiles = ["#{data_dir}/timing.log", "#{data_dir}/timing.log.1", "#{data_dir}/timing.log.2" ]
+        end
 
         context 'in descending order' do
           before :each do
