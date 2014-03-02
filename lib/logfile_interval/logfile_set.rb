@@ -34,6 +34,10 @@ module LogfileInterval
       each_by_method(__method__, &block)
     end
 
+    def first
+      each.first
+    end
+
     private
 
     def existing_filenames

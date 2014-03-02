@@ -94,9 +94,9 @@ module LogfileInterval
       describe Delta do
         it 'averages delta values' do
           d = Delta.new
-          d.add(1.4)
-          d.add(1.1)
           d.add(1.0)
+          d.add(1.1)
+          d.add(1.4)
           d.value.round(5).should == 0.2
         end
       end
@@ -200,10 +200,10 @@ module LogfileInterval
           d.add(5, :key2)
           d.values.should be_a(Hash)
           d.values.size.should == 2
-          d.value(:key1).should == 3
-          d.values[:key1].should == 3
-          d.value(:key2).should == 2.5
-          d.values[:key2].should == 2.5
+          d.value(:key1).should == -3
+          d.values[:key1].should == -3
+          d.value(:key2).should == -2.5
+          d.values[:key2].should == -2.5
         end
       end
     end

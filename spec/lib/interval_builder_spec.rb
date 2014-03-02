@@ -68,7 +68,7 @@ module LogfileInterval
             @intervals.first.end_time.should == Time.new(2013,12,01,16,0,0,'-08:00')
             @intervals.first[:total_time].should == 700.0/4
             @intervals.first[:num_bytes].should == 52000
-            @intervals.first[:rss].round(5).should == 0.60
+            @intervals.first[:rss].round(5).should == -0.60
             @intervals.first[:ip].should == {"192.168.0.5"=>3, "192.168.0.10"=>1}
             @intervals.first[:action].should == {"posts#show"=>2, "posts#create"=>1, "posts#index"=>1}
           end
@@ -80,17 +80,9 @@ module LogfileInterval
             @intervals.last.end_time.should == Time.new(2013,12,01,15,55,0,'-08:00')
             @intervals.last[:total_time].should == 300
             @intervals.last[:num_bytes].should == 41000
-            @intervals.last[:rss].round(5).should == 0.20
+            @intervals.last[:rss].round(5).should == -0.20
             @intervals.last[:ip].should == {"192.168.0.10"=>1, "192.168.0.5"=>1}
             @intervals.last[:action].should == {"posts#index"=>1, "posts#show"=>1}
-          end
-        end
-
-        context 'without a block' do
-          it 'should return an iterator' do
-            e = @builder.each_interval
-            e.should be_an(Enumerator)
-            e.next.end_time.should == Time.new(2013,12,01,16,0,0,'-08:00')
           end
         end
       end
@@ -138,6 +130,49 @@ module LogfileInterval
           @intervals.last[:rss].round(5).should == 0.60
           @intervals.last[:ip].should == {"192.168.0.5"=>3, "192.168.0.10"=>1}
           @intervals.last[:action].should == {"posts#show"=>2, "posts#create"=>1, "posts#index"=>1}
+        end
+      end
+
+      context 'with a gap in the logfiles' do
+          before :each do
+            Time.stub(:now).and_return(Time.new(2013,12,01,16,0,1,'-08:00'))
+            @logfiles = ["#{data_dir}/timing.log", "#{data_dir}/timing.log.1", "#{data_dir}/timing.log.2" ]
+          end
+
+        context 'in descending order' do
+          before :each do
+            @set = LogfileSet.new(@logfiles, ParsedLine::TimingLog, :desc)
+            @builder = IntervalBuilder.new(@set, ParsedLine::TimingLog, 300)
+            @intervals = []
+            @builder.each_interval do |interval|
+              @intervals << interval
+            end
+          end
+
+          it 'creates an empty interval' do
+            @intervals.size.should == 4
+            gap_interval = @intervals[2]
+            gap_interval.size.should == 0
+            gap_interval.end_time.should == Time.new(2013,12,01,15,50,0,'-08:00')
+          end
+        end
+
+        context 'in ascending order' do
+          before :each do
+            @set = LogfileSet.new(@logfiles, ParsedLine::TimingLog, :asc)
+            @builder = IntervalBuilder.new(@set, ParsedLine::TimingLog, 300)
+            @intervals = []
+            @builder.each_interval do |interval|
+              @intervals << interval
+            end
+          end
+
+          it 'creates an empty interval' do
+            @intervals.size.should == 4
+            gap_interval = @intervals[1]
+            gap_interval.size.should == 0
+            gap_interval.end_time.should == Time.new(2013,12,01,15,50,0,'-08:00')
+          end
         end
       end
     end

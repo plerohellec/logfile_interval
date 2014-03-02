@@ -116,7 +116,7 @@ module LogfileInterval
         end
 
         it 'averages the delta columns with delta aggregator' do
-          @interval[:rss].should == 1.5
+          @interval[:rss].should == -1.5
         end
 
         it 'counts columns with group aggregator' do
@@ -171,8 +171,8 @@ module LogfileInterval
         it 'averages deltas on value column per group column' do
           @interval[:rss].should be_a(Hash)
           @interval[:rss].size.should == 2
-          @interval[:rss]['posts#index'].should == 5
-          @interval[:rss]['posts#show'].should  == 1
+          @interval[:rss]['posts#index'].should == -5
+          @interval[:rss]['posts#show'].should  == -1
         end
       end
     end
