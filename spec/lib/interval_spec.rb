@@ -36,6 +36,7 @@ module LogfileInterval
       it 'with no data, should have keys with 0 values' do
         interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         hinterval = interval.to_hash
+        hinterval[:num_lines].should == 0
         hinterval[:ip].should == 0
         hinterval[:action].should == 0
         hinterval[:total_time].should == 0
@@ -70,6 +71,7 @@ module LogfileInterval
           @interval.add_record(record1)
 
           @interval.size.should == 1
+          @interval[:num_lines].should == 1
           @interval[:total_time].should == 100
           @interval[:num_bytes].should == 20000
           @interval[:action].should == {"posts#index"=>1}
@@ -105,6 +107,10 @@ module LogfileInterval
 
         it 'increments size' do
           @interval.size.should == 3
+        end
+
+        it 'counts the number of lines with the num_lines aggregator' do
+          @interval[:num_lines].should == 3
         end
 
         it 'averages columns with average aggregator' do
