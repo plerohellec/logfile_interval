@@ -31,10 +31,8 @@ module LogfileInterval
       yield current_interval if current_interval.size > 0
     end
 
-    def last_interval
-      each_interval do |interval|
-        return interval
-      end
+    def first_interval
+      each_interval.first
     end
 
     private
