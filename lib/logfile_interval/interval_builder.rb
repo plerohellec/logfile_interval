@@ -13,12 +13,14 @@ module LogfileInterval
       case order
       when :asc  then self.extend Ascending
       when :desc then self.extend Descending
+      when :empty then nil
       else raise ArgumentError, "Can't determine parsed_lines_enum sort order"
       end
     end
 
     def each_interval(&block)
       return enum_for(:each_interval) unless block_given?
+      return if order == :empty
 
       current_interval = create_first_interval
 
@@ -49,8 +51,10 @@ module LogfileInterval
 
     def order
       return @order if @order
+      num_lines = 0
       previous = nil
       parsed_lines_enum.each do |pl|
+        num_lines += 1
         if previous
           if pl.time > previous.time
             return @order = :asc
@@ -60,6 +64,7 @@ module LogfileInterval
         end
         previous = pl
       end
+      return @order = :empty if num_lines == 0
       return @order = :unknown
     end
 

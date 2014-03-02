@@ -13,7 +13,6 @@ module LogfileInterval
       end
 
       def register_aggregator(name, klass)
-        puts "register #{klass}"
         aggregator_classes[name] = klass
       end
 
