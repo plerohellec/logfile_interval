@@ -11,11 +11,19 @@ module LogfileInterval
     def each_interval(&block)
       return enum_for(:each_interval) unless block_given?
 
-      case order
-      when :asc  then each_interval_ascending(&block)
-      when :desc then each_interval_descending(&block)
+      current_interval = case order
+      when :asc  then first_interval_ascending(&block)
+      when :desc then first_interval_descending(&block)
       else raise 'unknown enumerator order'
       end
+
+      parsed_lines_enum.each do |record|
+        next if out_of_order_record?(current_interval, record)
+        current_interval = move_over_empty_intervals(current_interval, record) { |interval| yield interval }
+        current_interval.add_record(record)
+      end
+
+      yield current_interval if current_interval.size > 0
     end
 
     def last_interval
@@ -26,30 +34,15 @@ module LogfileInterval
 
     private
 
-    def each_interval_ascending
+    def first_interval_ascending
       first_record = parsed_lines_enum.first
       interval_end_time = upper_boundary_time(first_record.time)
       current_interval = Interval.new(interval_end_time, length, parser_columns)
-
-      parsed_lines_enum.each do |record|
-        current_interval = move_over_empty_intervals(current_interval, record) { |interval| yield interval }
-        current_interval.add_record(record)
-      end
-
-      yield current_interval if current_interval && current_interval.size > 0
     end
 
-    def each_interval_descending
+    def first_interval_descending
       interval_end_time = lower_boundary_time(Time.now)
       current_interval = Interval.new(interval_end_time, length, parser_columns)
-
-      parsed_lines_enum.each do |record|
-        next if record.time > current_interval.end_time
-        current_interval = move_over_empty_intervals(current_interval, record) { |interval| yield interval }
-        current_interval.add_record(record)
-      end
-
-      yield current_interval if current_interval.size>0
     end
 
     def lower_boundary_time(t)
@@ -90,6 +83,13 @@ module LogfileInterval
       case order
       when :asc  then record.time  > current_interval.end_time
       when :desc then record.time <= current_interval.start_time
+      end
+    end
+
+    def out_of_order_record?(current_interval, record)
+      case order
+      when :asc  then record.time <= current_interval.start_time
+      when :desc then record.time  > current_interval.end_time
       end
     end
 
