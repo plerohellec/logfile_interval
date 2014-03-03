@@ -122,6 +122,7 @@ end
 
 #### Aggregator types and options
 * timestamp: the timestamp field will be used to determine to which interval the line belongs, each line MUST have a timestamp
+* num_lines: the most simple aggregator simply counts the number of lines
 * count: the aggregator will count the number of occurence of this field
   * without the group_by option, it will just count the total number of lines (probably useless)
   * with a group_by option pointing to the same field as the current one, it will count the number of occurence
@@ -129,7 +130,7 @@ end
   * with a group_by option pointing to another field, it will count the number of occurences of (this field, other field) pairs.
 * average: the aggregator will calculate the average value of this field
 * sum: the aggregator will add up the values of this field
-* delta: the aggregator will caclculate the difference between each line and the next and will average all the deltas
+* delta: the aggregator will calculate the difference between each line and the previous one and will average all the deltas
 
 ### Iterate through lines of a single file
 And get a parsed record for each line.
@@ -163,7 +164,7 @@ set.each_parsed_line do |record|
   puts record.class # LineParser::AccessLog
 end
 ```
-**Note**: the LogfileSet iterators always starts with the most recent file.
+**Note**: the LogfileSet iterators advances in the order of logfiles enumerator. If the enumerator is ascending, the builder will yield intervals in ascending order and vice-versa.
 
 ### Aggregate lines into intervals
 ```ruby
