@@ -34,6 +34,11 @@ module LogfileInterval
       each_by_method(__method__, &block)
     end
 
+    def first_parsed_line
+      each_parsed_line.first
+    end
+    alias_method :first, :first_parsed_line
+
     private
 
     def existing_filenames

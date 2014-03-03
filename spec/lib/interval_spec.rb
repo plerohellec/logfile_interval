@@ -36,6 +36,7 @@ module LogfileInterval
       it 'with no data, should have keys with 0 values' do
         interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         hinterval = interval.to_hash
+        hinterval[:num_lines].should == 0
         hinterval[:ip].should == 0
         hinterval[:action].should == 0
         hinterval[:total_time].should == 0
@@ -60,11 +61,17 @@ module LogfileInterval
           lambda { @interval.add_record(oor_record) }.should raise_error(Interval::OutOfRange)
         end
 
+        it 'accepts record at interval end_time' do
+          oor_record = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 50.0')
+          lambda { @interval.add_record(oor_record) }.should_not raise_error
+        end
+
         it 'adds 1 record to interval' do
           record1 = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 20000, 50.0')
           @interval.add_record(record1)
 
           @interval.size.should == 1
+          @interval[:num_lines].should == 1
           @interval[:total_time].should == 100
           @interval[:num_bytes].should == 20000
           @interval[:action].should == {"posts#index"=>1}
@@ -73,7 +80,7 @@ module LogfileInterval
       end
 
       context 'with count and group by options' do
-        it 'creates an aggregator of type GroupAndCount' do
+        it 'creates an aggregator of type Count' do
           expect(Aggregator::Count).to receive(:new).twice
           interval = Interval.new(@end_time, @length, ParsedLine::TimingLogWithGrouping.columns)
         end
@@ -102,6 +109,10 @@ module LogfileInterval
           @interval.size.should == 3
         end
 
+        it 'counts the number of lines with the num_lines aggregator' do
+          @interval[:num_lines].should == 3
+        end
+
         it 'averages columns with average aggregator' do
           @interval[:total_time].should == 70
         end
@@ -111,7 +122,7 @@ module LogfileInterval
         end
 
         it 'averages the delta columns with delta aggregator' do
-          @interval[:rss].should == 1.5
+          @interval[:rss].should == -1.5
         end
 
         it 'counts columns with group aggregator' do
@@ -166,8 +177,8 @@ module LogfileInterval
         it 'averages deltas on value column per group column' do
           @interval[:rss].should be_a(Hash)
           @interval[:rss].size.should == 2
-          @interval[:rss]['posts#index'].should == 5
-          @interval[:rss]['posts#show'].should  == 1
+          @interval[:rss]['posts#index'].should == -5
+          @interval[:rss]['posts#show'].should  == -1
         end
       end
     end

@@ -6,12 +6,12 @@ module LogfileInterval
         super
       end
 
-      def add(value, group_by = nil)
-        if @previous.has_key?(key(group_by))
-          @val.add(key(group_by), @previous[key(group_by)] - value)
-          @size.increment(key(group_by))
+      def add(value, group_by_value = nil)
+        if @previous.has_key?(key(group_by_value))
+          @val.add(key(group_by_value), value - @previous[key(group_by_value)])
+          @size.increment(key(group_by_value))
         end
-        @previous.set(key(group_by), value)
+        @previous.set(key(group_by_value), value)
       end
 
       def val(k)

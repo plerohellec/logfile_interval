@@ -11,6 +11,7 @@ module LogfileInterval
       
     describe Base do
       it 'finds the aggregator class' do
+        Aggregator::Base.klass(:num_lines).should == NumLines
         Aggregator::Base.klass(:sum).should == Sum
         Aggregator::Base.klass(:average).should == Average
         Aggregator::Base.klass(:count).should == Count
@@ -36,7 +37,7 @@ module LogfileInterval
           end
 
           it 'returns a hash' do
-            aggregator.values.should be_a(Hash) unless aggregator.is_a?(Delta)
+            aggregator.values.should be_a(Hash) unless [ Delta, NumLines ].include?(aggregator.class)
           end
         end
 
@@ -65,7 +66,7 @@ module LogfileInterval
       end
     end
 
-    [ Count, Sum, Average, Delta ]. each do |klass|
+    [ NumLines, Count, Sum, Average, Delta ]. each do |klass|
       describe klass do
         it_behaves_like 'an aggregator'
       end
@@ -73,6 +74,16 @@ module LogfileInterval
 
 
     describe 'without group_by key' do
+      describe NumLines do
+        it 'counts total number of lines' do
+          nl = NumLines.new
+          nl.add(55)
+          nl.add(54)
+          nl.add(1008)
+          nl.value.should == 3
+        end
+      end
+
       describe Sum do
         it 'sums up values' do
           sum = Sum.new
@@ -94,9 +105,9 @@ module LogfileInterval
       describe Delta do
         it 'averages delta values' do
           d = Delta.new
-          d.add(1.4)
-          d.add(1.1)
           d.add(1.0)
+          d.add(1.1)
+          d.add(1.4)
           d.value.round(5).should == 0.2
         end
       end
@@ -200,10 +211,10 @@ module LogfileInterval
           d.add(5, :key2)
           d.values.should be_a(Hash)
           d.values.size.should == 2
-          d.value(:key1).should == 3
-          d.values[:key1].should == 3
-          d.value(:key2).should == 2.5
-          d.values[:key2].should == 2.5
+          d.value(:key1).should == -3
+          d.values[:key1].should == -3
+          d.value(:key2).should == -2.5
+          d.values[:key2].should == -2.5
         end
       end
     end

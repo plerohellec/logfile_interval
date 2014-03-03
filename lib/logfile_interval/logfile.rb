@@ -48,6 +48,11 @@ module LogfileInterval
     end
     alias_method :each, :each_parsed_line
 
+    def first_parsed_line
+      each_parsed_line.first
+    end
+    alias_method :first, :first_parsed_line
+
     private
     def each_line_descending
       f = Util::FileBackward.new(@filename)
