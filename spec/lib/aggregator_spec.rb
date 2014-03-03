@@ -30,7 +30,7 @@ module LogfileInterval
         end
       end
 
-      context 'values' do
+      describe 'values' do
         context 'with one group' do
           before :each do
             aggregator.add(5, :key1)

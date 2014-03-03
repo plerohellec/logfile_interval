@@ -9,6 +9,7 @@ require "#{lib_dir}/logfile_interval/logfile_set"
 require "#{lib_dir}/logfile_interval/parsed_line/parser"
 require "#{lib_dir}/logfile_interval/parsed_line/base"
 require "#{lib_dir}/logfile_interval/util/counter"
+require "#{lib_dir}/logfile_interval/util/single_counter"
 require "#{lib_dir}/logfile_interval/util/file_backward"
 require "#{lib_dir}/logfile_interval/aggregator/base"
 

@@ -3,7 +3,6 @@ require File.join(File.expand_path('..', __FILE__), '/registrar')
 module LogfileInterval
   module Aggregator
     class Base
-
       extend Registrar
       include Enumerable
 
@@ -21,11 +20,7 @@ module LogfileInterval
       end
 
       def values
-        if single_value?
-          value
-        else
-          self.inject({}) { |h, v| h[v[0]] = v[1]; h }
-        end
+        @val.values
       end
 
       def add(value, group_by_value = nil)
@@ -36,11 +31,6 @@ module LogfileInterval
 
       def key(group_by = nil)
         group_by ? group_by : :all
-      end
-
-      def single_value?
-        return true if @val.empty?
-        @val.keys.count == 1 && @val.keys.first == :all
       end
 
       def each

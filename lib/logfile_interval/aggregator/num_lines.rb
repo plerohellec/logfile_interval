@@ -1,12 +1,13 @@
 module LogfileInterval
   module Aggregator
     class NumLines < Base
+      def initialize(options = {})
+        super(options)
+        @val = Util::SingleCounter.new
+      end
+
       def add(value, group_by_value = nil)
-        if group_by_value
-          @val.increment_subkey(:all, key(group_by_value))
-        else
-          @val.increment(:all)
-        end
+        @val.increment(nil)
       end
     end
   end

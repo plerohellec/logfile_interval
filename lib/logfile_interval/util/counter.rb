@@ -28,18 +28,16 @@ module LogfileInterval
         end
       end
 
-      def set(key, num)
-        self[key] = num
-      end
-
       def [](key)
         self.fetch(key, 0)
       end
 
-      def merge(c)
-        c.keys.each do |k|
-          self.add c[k]
-        end
+      def value(k)
+        self[k]
+      end
+
+      def values
+        self.inject({}) { |h, v| h[v[0]] = v[1]; h }
       end
     end
   end
