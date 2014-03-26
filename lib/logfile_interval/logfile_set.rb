@@ -4,10 +4,11 @@ module LogfileInterval
 
     ORDER_VALID_VALUES = [ :asc, :desc ]
 
-    def initialize(filenames, parser, order = :desc)
+    def initialize(filenames, parser, order = :desc, &file_time_finder_block)
       @parser    = parser
       @filenames = filenames
       @order    = order
+      @file_time_finder_block = file_time_finder_block if block_given?
 
       raise ArgumentError, "invalid order value: #{@order}" unless ORDER_VALID_VALUES.include?(@order.to_sym)
     end
@@ -56,8 +57,13 @@ module LogfileInterval
 
     def time_for_files(filenames)
       filenames.inject({}) do |h, filename|
-        file = Logfile.new(filename, parser)
-        h[filename] = file.first_timestamp
+        if @file_time_finder_block
+          t = @file_time_finder_block.call(filename)
+        else
+          file = Logfile.new(filename, parser)
+          t = file.first_timestamp
+        end
+        h[filename] = t
         h
       end
     end

@@ -13,10 +13,6 @@ module LogfileInterval
       @last_line  = '12.24.48.96 - - [23/Jun/2013:16:49:00 -0800] "GET /package/core/raring/universe/proposed/bash HTTP/1.1" 200 4555 "-" "Bing)"'
     end
 
-    it 'ordered_filenames should return the most recent file first' do
-      @set.ordered_filenames.should == @logfiles.reverse
-    end
-
     describe :each_line do
       it 'should enumerate each line in file backwards' do
         lines = []
@@ -79,6 +75,23 @@ module LogfileInterval
           e = @set.each_parsed_line
           e.should be_a(Enumerator)
           e.next.time.should == Time.new(2013, 06, 23, 17, 00, 01, '-08:00')
+        end
+      end
+    end
+
+    describe :ordered_filenames do
+      it 'returns the most recent file first' do
+        @set.ordered_filenames.should == @logfiles.reverse
+      end
+
+      context 'with file_time_finder_block' do
+        it 'sorts the files in the order described in the block' do
+          set = LogfileSet.new(@logfiles, ParsedLine::AccessLog) do |filename|
+            filename.match /(?<num>\d+$)/ do |matchdata|
+              matchdata[:num].to_i
+            end
+          end
+          set.ordered_filenames.should == @logfiles
         end
       end
     end
