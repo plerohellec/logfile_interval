@@ -33,6 +33,14 @@ module LogfileInterval
         hinterval.keys.should include(:ip, :total_time, :action, :num_bytes, :rss)
       end
 
+      it 'has start_time and end_time keys' do
+        record   = ParsedLine::TimingLog.create_record('1385942400, 192.168.0.5, posts#index, 100, 2000, 53.0')
+        interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
+        interval.add_record(record)
+        hinterval = interval.to_hash
+        hinterval.keys.should include(:start_time, :end_time)
+      end
+
       it 'with no data, should have keys with 0 values' do
         interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         hinterval = interval.to_hash

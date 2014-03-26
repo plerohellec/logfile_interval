@@ -21,7 +21,10 @@ module LogfileInterval
     end
 
     def to_hash
-      @aggregators.to_hash
+      h = @aggregators.to_hash
+      h[:start_time] = self.start_time
+      h[:end_time] = self.end_time
+      h
     end
 
     def add_record(record)
