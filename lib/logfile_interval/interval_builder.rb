@@ -5,10 +5,11 @@ module LogfileInterval
   class IntervalBuilder
     attr_reader :parsed_lines_enum, :parser_columns, :length
 
-    def initialize(parsed_lines_enum, parser_columns, length)
+    def initialize(parsed_lines_enum, parser_columns, length, options = {})
       @parsed_lines_enum = parsed_lines_enum
       @parser_columns    = parser_columns
       @length            = length
+      @boundary_offset   = options.fetch(:offset, 0)
 
       case order
       when :asc  then self.extend Ascending
@@ -37,17 +38,17 @@ module LogfileInterval
       each_interval.first
     end
 
-    private
-
     def lower_boundary_time(t)
-      secs = (t.to_i / length.to_i) * length.to_i
+      secs = ((t.to_i - @boundary_offset) / length.to_i) * length.to_i + @boundary_offset
       Time.at(secs)
     end
 
     def upper_boundary_time(t)
-      secs = (t.to_i / length.to_i + 1) * length.to_i
+      secs = ((t.to_i - @boundary_offset)/ (length.to_i + 1)) * length.to_i + @boundary_offset
       Time.at(secs)
     end
+
+    private
 
     def order
       return @order if @order

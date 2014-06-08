@@ -6,7 +6,6 @@ module LogfileInterval
     class OutOfRange < StandardError; end
 
     def initialize(end_time, length, parser_columns)
-      raise ArgumentError, 'end_time must be round' unless (end_time.to_i % length.to_i == 0)
       @end_time   = end_time
       @start_time = end_time - length
       @length     = length
