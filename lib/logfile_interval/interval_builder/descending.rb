@@ -2,7 +2,7 @@ module LogfileInterval
   class IntervalBuilder
     module Descending
       def create_first_interval
-        interval_end_time = lower_boundary_time(Time.now)
+        interval_end_time = start_boundary_time(Time.now)
         Interval.new(interval_end_time, length, parser_columns)
       end
 

@@ -3,7 +3,7 @@ module LogfileInterval
     module Ascending
       def create_first_interval
         first_record = parsed_lines_enum.first
-        interval_end_time = upper_boundary_time(first_record.time)
+        interval_end_time = end_boundary_time(first_record.time)
         Interval.new(interval_end_time, length, parser_columns)
       end
 

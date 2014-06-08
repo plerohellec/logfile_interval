@@ -38,11 +38,11 @@ module LogfileInterval
       end
     end
 
-    describe :lower_boundary_time do
+    describe :start_boundary_time do
       it 'returns the start of the interval on a round boundary' do
         set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
         builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 60)
-        expect(builder.lower_boundary_time(Time.new(2013,12,01,16,0,1))).to eql(Time.new(2013,12,01,16,0,0))
+        expect(builder.start_boundary_time(Time.new(2013,12,01,16,0,1))).to eql(Time.new(2013,12,01,16,0,0))
       end
 
       it 'first interval is aligned on round boundary' do
@@ -56,7 +56,7 @@ module LogfileInterval
         it 'returns the start of the interval on an offset boundary' do
           set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
           builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 60, offset: 5)
-          expect(builder.lower_boundary_time(Time.new(2013,12,01,16,0,1))).to eql(Time.new(2013,12,01,15,59,05))
+          expect(builder.start_boundary_time(Time.new(2013,12,01,16,0,1))).to eql(Time.new(2013,12,01,15,59,05))
         end
 
         it 'first interval is aligned on round boundary' do

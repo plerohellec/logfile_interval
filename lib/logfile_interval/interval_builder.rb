@@ -38,13 +38,13 @@ module LogfileInterval
       each_interval.first
     end
 
-    def lower_boundary_time(t)
+    def start_boundary_time(t)
       secs = ((t.to_i - @boundary_offset) / length.to_i) * length.to_i + @boundary_offset
       Time.at(secs)
     end
 
-    def upper_boundary_time(t)
-      secs = ((t.to_i - @boundary_offset)/ (length.to_i + 1)) * length.to_i + @boundary_offset
+    def end_boundary_time(t)
+      secs = ((t.to_i - @boundary_offset)/ length.to_i + 1) * length.to_i + @boundary_offset
       Time.at(secs)
     end
 
