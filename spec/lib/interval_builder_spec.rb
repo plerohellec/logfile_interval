@@ -38,7 +38,7 @@ module LogfileInterval
       end
     end
 
-    describe :start_boundary_time do
+    describe :boundary_offset do
       it 'returns the start of the interval on a round boundary' do
         set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
         builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 60)
@@ -55,18 +55,35 @@ module LogfileInterval
       context 'with offset' do
         it 'returns the start of the interval on an offset boundary' do
           set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
-          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 60, offset: 5)
+          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 60, boundary_offset: 5)
           expect(builder.start_boundary_time(Time.new(2013,12,01,16,0,1))).to eql(Time.new(2013,12,01,15,59,05))
         end
 
         it 'first interval is aligned on round boundary' do
           Time.stub(:now).and_return(Time.new(2013,12,01,17,1,1,'-08:00'))
           set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
-          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 3600, offset: 300)
+          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 3600, boundary_offset: 300)
           builder.first_interval.start_time.should == Time.new(2013,12,01,15,05,0,'-08:00')
-          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 3600, offset: 60)
+          builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 3600, boundary_offset: 60)
           builder.first_interval.start_time.should == Time.new(2013,12,01,16,01,0,'-08:00')
         end
+      end
+    end
+
+    describe :offset_by_start_time do
+      it 'returns the start of the interval on an offset boundary' do
+        set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
+        builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 60, offset_by_start_time: Time.new(2013,12,01,15,59,05))
+        expect(builder.start_boundary_time(Time.new(2013,12,01,16,0,1))).to eql(Time.new(2013,12,01,15,59,05))
+      end
+
+      it 'first interval is aligned on round boundary' do
+        Time.stub(:now).and_return(Time.new(2013,12,01,17,1,1,'-08:00'))
+        set = LogfileSet.new(@logfiles, ParsedLine::TimingLog)
+        builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 3600, offset_by_start_time: Time.new(2013,12,01,16,05,0))
+        builder.first_interval.start_time.should == Time.new(2013,12,01,15,05,0,'-08:00')
+        builder = IntervalBuilder.new(set, ParsedLine::TimingLog, 3600, offset_by_start_time: Time.new(2013,12,01,15,01,0))
+        builder.first_interval.start_time.should == Time.new(2013,12,01,16,01,0,'-08:00')
       end
     end
 

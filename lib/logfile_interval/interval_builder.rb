@@ -9,7 +9,14 @@ module LogfileInterval
       @parsed_lines_enum = parsed_lines_enum
       @parser_columns    = parser_columns
       @length            = length
-      @boundary_offset   = options.fetch(:offset, 0)
+
+      raise ArgumentError if options.include?(:boundary_offset) && options.include?(:offset_by_start_time)
+
+      @boundary_offset      = options.fetch(:boundary_offset, 0)
+      offset_by_start_time  = options.fetch(:offset_by_start_time, nil)
+      if offset_by_start_time
+        @boundary_offset = offset_by_start_time.to_i % length
+      end
 
       case order
       when :asc  then self.extend Ascending
