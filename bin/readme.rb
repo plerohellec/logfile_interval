@@ -21,14 +21,13 @@ class AccessLogParsedLine < LogfileInterval::ParsedLine::Base
 end
 
 path = ENV['ACCESS_LOG_PATH']
-file = LogfileInterval::Logfile.new(path, AccessLogParsedLine)
-unless file.exist?
+logfile = LogfileInterval::Logfile.new(path, AccessLogParsedLine)
+unless logfile.exist?
   puts "#{path} is not found"
   exit 1
 end
-parsed_line_enum = file.each_parsed_line
 
-builder = LogfileInterval::IntervalBuilder.new(parsed_line_enum, AccessLogParsedLine, 300)
+builder = LogfileInterval::IntervalBuilder.new(logfile, AccessLogParsedLine, 5*60)
 builder.each_interval do |interval|
   next unless interval.size > 0
 
