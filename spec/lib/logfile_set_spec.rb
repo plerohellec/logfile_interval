@@ -6,7 +6,7 @@ module LogfileInterval
 
   describe LogfileSet do
     before :each do
-      @logfiles = ["#{data_dir}/access.log.2", "#{data_dir}/access.log.1"]
+      @logfiles = ["#{data_dir}/access.log.2", "#{data_dir}/access.log.1", "#{data_dir}/access.log.empty"]
       @set = LogfileSet.new(@logfiles, ParsedLine::AccessLog)
       @first_line = '66.249.67.176 - - [23/Jun/2013:17:00:01 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 185 "-" "Google"'
       @second_line = '12.24.48.96 - - [23/Jun/2013:16:59:00 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 4555 "-" "Bing)"'
@@ -55,6 +55,13 @@ module LogfileInterval
           lines.last.should  == @first_line
         end
       end
+
+      context 'emoty logfiles' do
+        it 'are ignored' do
+          set = LogfileSet.new(@logfiles, ParsedLine::AccessLog, :asc)
+          expect(set.ordered_filenames).to_not include("#{data_dir}/access.log.empty")
+        end
+      end
     end
 
     describe :each_parsed_line do
@@ -80,8 +87,12 @@ module LogfileInterval
     end
 
     describe :ordered_filenames do
-      it 'returns the most recent file first' do
-        @set.ordered_filenames.should == @logfiles.reverse
+      before :each do
+        @non_empty_logfiles = @logfiles.reject { |f| !File.size?(f) }
+      end
+
+      it 'returns the most recent non empty file first' do
+        @set.ordered_filenames.should == @non_empty_logfiles.reverse
       end
 
       context 'with file_time_finder_block' do
@@ -91,7 +102,7 @@ module LogfileInterval
               matchdata[:num].to_i
             end
           end
-          set.ordered_filenames.should == @logfiles
+          set.ordered_filenames.should == @non_empty_logfiles
         end
       end
     end

@@ -6,7 +6,7 @@ module LogfileInterval
 
     def initialize(filenames, parser, order = :desc, &file_time_finder_block)
       @parser    = parser
-      @filenames = filenames
+      @filenames = reject_empty_files(filenames)
       @order    = order
       @file_time_finder_block = file_time_finder_block if block_given?
 
@@ -65,6 +65,12 @@ module LogfileInterval
         end
         h[filename] = t
         h
+      end
+    end
+
+    def reject_empty_files(filenames)
+      filenames.reject do |fname|
+        !File.size?(fname)
       end
     end
   end
