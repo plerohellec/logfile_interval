@@ -10,6 +10,9 @@ module LogfileInterval
       @order    = order
       @file_time_finder_block = file_time_finder_block if block_given?
 
+      reject_empty_files!
+      reject_files_with_no_valid_line!
+
       raise ArgumentError, "invalid order value: #{@order}" unless ORDER_VALID_VALUES.include?(@order.to_sym)
     end
 
@@ -65,6 +68,19 @@ module LogfileInterval
         end
         h[filename] = t
         h
+      end
+    end
+
+    def reject_empty_files!
+      @filenames.reject do |fname|
+        !File.size?(fname)
+      end
+    end
+
+    def reject_files_with_no_valid_line!
+      @filenames.reject! do |fname|
+        file = Logfile.new(fname, parser)
+        !file.first_parsed_line
       end
     end
   end
