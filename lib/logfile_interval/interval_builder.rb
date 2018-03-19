@@ -20,9 +20,8 @@ module LogfileInterval
 
       case order
       when :asc  then self.extend Ascending
-      when :desc then self.extend Descending
-      when :empty then nil
-      else raise ArgumentError, "Can't determine parsed_lines_enum sort order"
+      else
+        self.extend Descending
       end
     end
 
