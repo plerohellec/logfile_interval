@@ -70,6 +70,14 @@ module LogfileInterval
           end
         end
 
+        skip_columns_with_exceptions.each do |options|
+          val = match_data[options[:pos]]
+          if val =~ options[:regex]
+            data[:skip_with_exceptions] = true
+            break
+          end
+        end
+
         data
       end
 
