@@ -12,6 +12,8 @@ module LogfileInterval
     def add(record)
       @parser_columns.each do |name, options|
         next unless @aggregators[name]
+        next unless options[:noskip] || !record.skip_with_exceptions?
+
         group_by_value = record[options[:group_by]] if options[:group_by]
         @aggregators[name].add(record[name], group_by_value)
       end

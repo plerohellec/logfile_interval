@@ -13,6 +13,10 @@ module LogfileInterval
         @skip_columns ||= []
       end
 
+      def skip_columns_with_exceptions
+        @skip_columns_with_exceptions ||= []
+      end
+
       def set_regex(regex)
         @regex = regex
       end
@@ -35,6 +39,14 @@ module LogfileInterval
         end
 
         skip_columns << { pos: options[:pos], regex: options[:regex] }
+      end
+
+      def skip_with_exceptions(options)
+        unless options[:pos] && options[:regex]
+          raise ConfigurationError, "skip option must include pos and regex"
+        end
+
+        skip_columns_with_exceptions << { pos: options[:pos], regex: options[:regex] }
       end
 
       def parse(line)

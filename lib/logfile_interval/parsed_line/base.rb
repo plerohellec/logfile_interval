@@ -11,6 +11,7 @@ module LogfileInterval
         @data = self.class.parse(line)
         @valid = @data ? true : false
         @skip = @data ? @data[:skip] : false
+        @skip_with_exceptions = @data ? @data[:skip_with_exceptions] : false
       end
 
       def valid?
@@ -19,6 +20,10 @@ module LogfileInterval
 
       def skip?
         @skip
+      end
+
+      def skip_with_exceptions?
+        @skip_with_exceptions
       end
 
       def time
