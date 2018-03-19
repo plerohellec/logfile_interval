@@ -4,9 +4,13 @@ module LogfileInterval
 
     module Parser
       attr_reader :regex
-      
+
       def columns
         @columns ||= {}
+      end
+
+      def skip_columns
+        @skip_columns ||= []
       end
 
       def set_regex(regex)
@@ -25,6 +29,14 @@ module LogfileInterval
         end
       end
 
+      def skip(options)
+        unless options[:pos] && options[:regex]
+          raise ConfigurationError, "skip option must include pos and regex"
+        end
+
+        skip_columns << { pos: options[:pos], regex: options[:regex] }
+      end
+
       def parse(line)
         raise ConfigurationError, 'There must be at least 1 configured column' unless columns.any?
         raise ConfigurationError, 'A regex must be set' unless regex
@@ -32,11 +44,20 @@ module LogfileInterval
         match_data = regex.match(line)
         return nil unless match_data
 
-        data = {}
+        data = { skip: false }
         columns.each do |name, options|
           val = match_data[options[:pos]]
           data[name] = convert(val, options[:conversion])
         end
+
+        skip_columns.each do |options|
+          val = match_data[options[:pos]]
+          if val =~ options[:regex]
+            data[:skip] = true
+            break
+          end
+        end
+
         data
       end
 
@@ -62,6 +83,9 @@ module LogfileInterval
         validate_option(options, :name)
         validate_option(options, :pos)
         validate_option(options, :aggregator)
+        if options[:name].to_s == 'skip'
+          raise ConfigurationError, "'skip' is a reserved column name"
+        end
         unless Aggregator::Base.exist?(options[:aggregator]) || options[:aggregator] == :timestamp
           raise ConfigurationError, "aggregator must be one of #{Aggregator::Base.all.join(', ')}"
         end

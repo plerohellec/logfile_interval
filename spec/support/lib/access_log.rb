@@ -15,6 +15,8 @@ module LogfileInterval
       add_column :name => 'length',       :pos => 5, :aggregator => :average,   :conversion => :integer
       add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :conversion => :integer, :group_by => 'ip'
 
+      skip :pos => 7, :regex => /Spinn3r/
+
       def time
         Time.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z')
       end

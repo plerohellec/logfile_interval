@@ -43,7 +43,7 @@ module LogfileInterval
       return enum_for(:each_parsed_line) unless block_given?
       each_line do |line|
         record = parser.create_record(line)
-        yield record if record
+        yield record if record && !record.skip?
       end
     end
     alias_method :each, :each_parsed_line

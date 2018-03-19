@@ -78,6 +78,15 @@ module LogfileInterval
         records.last.length_by_ip.should == 185
       end
 
+      it 'skips lines matching skip options' do
+        records = []
+        @alf.each_parsed_line do |record|
+          records << record
+        end
+
+        records.size.should == 6
+      end
+
       context 'without a block' do
         it 'should return an enumerator' do
           e = @alf.each_parsed_line

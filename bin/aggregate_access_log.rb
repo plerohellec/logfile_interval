@@ -18,9 +18,9 @@ class AccessLogParsedLine < LogfileInterval::ParsedLine::Base
 
   add_column :name => 'ip',           :pos => 1, :aggregator => :count
   add_column :name => 'timestamp',    :pos => 2, :aggregator => :timestamp
-  add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
-  add_column :name => 'length',       :pos => 5, :aggregator => :average,                      :conversion => :integer
-  add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :group_by => 'ip', :conversion => :integer
+  add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => :ip
+  add_column :name => 'length',       :pos => 5, :aggregator => :average,                     :conversion => :integer
+  add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :group_by => :ip, :conversion => :integer
   add_column :name => 'referer',      :pos => 6, :aggregator => :count
   add_column :name => 'referer_by_ip', :pos => 6, :aggregator => :count,    :group_by => :ip
 
@@ -40,4 +40,3 @@ builder.each_interval do |interval|
   pp interval[:referer_by_ip]
   STDIN.gets
 end
-

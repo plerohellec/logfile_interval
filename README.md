@@ -33,6 +33,8 @@ class AccessLog < LogfileInterval::ParsedLine::Base
   add_column :name => 'code',         :pos => 4, :aggregator => :count
   add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
 
+  skip                                :pos => 3, :regex => /firefox/
+
   def time
     DateTime.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z').to_time
   end
@@ -97,6 +99,8 @@ class AccessLog < LogfileInterval::ParsedLine::Base
   add_column :name => 'length',       :pos => 5, :aggregator => :average,                      :conversion => :integer
   add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :group_by => 'ip', :conversion => :integer
 
+  skip                                :pos => 3, :regex => /firefox/
+
   def time
     Time.strptime(self.timestamp, '%d/%b/%Y:%H:%M:%S %z')
   end
@@ -105,6 +109,7 @@ end
 #### The parser must define:
 * A regex that extracts the fields out of each line.
 * A set of columns that will to be parsed and aggregated in time intervals.
+* 0 or more column that will be skipped if the column value matches the specified regex
 * A 'time' method that converts the mandatory timestamp field of a line into a Time object.
 
 #### Attributes of a column:
