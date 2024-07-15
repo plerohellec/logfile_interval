@@ -6,7 +6,17 @@ module LogfileInterval
       attr_reader :data
 
       extend Parser
-      extend LoglineRegex
+
+      def self.set_line_parser(parser_name)
+        case parser_name
+        when :logline_regex
+          extend LoglineRegex
+        when :model
+          extend Model
+        else
+          raise "Unexpected parser_name (should be one of :logline_regex or :model)"
+        end
+      end
 
       def initialize(line)
         @data = self.class.parse(line)
