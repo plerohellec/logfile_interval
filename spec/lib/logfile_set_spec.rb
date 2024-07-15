@@ -9,9 +9,9 @@ module LogfileInterval
       @logfiles = ["#{data_dir}/access.log.2",
                    "#{data_dir}/access.log.1"]
       @set = LogfileSet.new(@logfiles, ParsedLine::AccessLog)
-      @first_line = '66.249.67.176 - - [23/Jun/2013:17:00:01 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 185 "-" "Google"'
-      @second_line = '12.24.48.96 - - [23/Jun/2013:16:59:00 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 4555 "-" "Bing)"'
-      @last_line  = '12.24.48.96 - - [23/Jun/2013:16:49:00 -0800] "GET /package/core/raring/universe/proposed/bash HTTP/1.1" 200 4555 "-" "Bing)"'
+      @first_line = '66.249.67.176 - - [23/Jun/2024:17:00:01 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 185 "-" "Google"'
+      @second_line = '12.24.48.96 - - [23/Jun/2024:16:59:00 -0800] "GET /package/core/raring/universe/proposed/openldap HTTP/1.1" 200 4555 "-" "Bing)"'
+      @last_line  = '12.24.48.96 - - [23/Jun/2024:16:49:00 -0800] "GET /package/core/raring/universe/proposed/bash HTTP/1.1" 200 4555 "-" "Bing)"'
     end
 
     describe :each_line do
@@ -65,9 +65,9 @@ module LogfileInterval
           records << record
         end
 
-        records.first.time.should == Time.new(2013, 06, 23, 17, 00, 01, '-08:00')
+        records.first.time.should == Time.new(2024, 06, 23, 17, 00, 01, '-08:00')
         records.first.code.should == '200'
-        records.last.time.should  == Time.new(2013, 06, 23, 16, 49, 00, '-08:00')
+        records.last.time.should  == Time.new(2024, 06, 23, 16, 49, 00, '-08:00')
         records.last.code.should == '200'
       end
 
@@ -75,7 +75,7 @@ module LogfileInterval
         it 'should return an enumerator' do
           e = @set.each_parsed_line
           e.should be_a(Enumerator)
-          e.next.time.should == Time.new(2013, 06, 23, 17, 00, 01, '-08:00')
+          e.next.time.should == Time.new(2024, 06, 23, 17, 00, 01, '-08:00')
         end
       end
     end
