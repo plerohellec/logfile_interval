@@ -22,7 +22,7 @@ module LogfileInterval
         line = 'abcdef'
         record = 'unset'
         lambda { record = AccessLog.new(line) }.should_not raise_error
-        record.valid?.should be_false
+        record.valid?.should be false
       end
 
       describe 'class' do
