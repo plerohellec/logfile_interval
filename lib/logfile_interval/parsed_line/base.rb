@@ -6,6 +6,7 @@ module LogfileInterval
       attr_reader :data
 
       extend Parser
+      extend LoglineRegex
 
       def initialize(line)
         @data = self.class.parse(line)
