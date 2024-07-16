@@ -9,10 +9,10 @@ module LogfileInterval
 
       def self.set_line_parser(parser_name)
         case parser_name
-        when :logline_regex
-          extend LoglineRegex
-        when :model
-          extend Model
+        when :logfile_line
+          extend LogfileLine
+        when :model_line
+          extend ModelLine
         else
           raise "Unexpected parser_name (should be one of :logline_regex or :model)"
         end

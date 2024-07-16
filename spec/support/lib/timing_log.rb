@@ -4,6 +4,8 @@ module LogfileInterval
       # Line format:
       # timestamp, ip, controller#action, total_time, bytes, rss
 
+      set_line_parser :logfile_line
+
       set_regex /^(\d+),\s*([\d\.]+),\s*(\w+#\w+),\s*(\d+),\s*(\d+),\s*([\d\.]+)$/
 
       add_column :name => :timestamp,    :pos => 1, :aggregator => :timestamp
@@ -22,6 +24,8 @@ module LogfileInterval
     class TimingLogWithGrouping < Base
       # Line format:
       # timestamp, controller#action, total_time, bytes
+
+      set_line_parser :logfile_line
 
       set_regex /^(\d+),\s*([\d\.]+),\s*(\w+#\w+),\s*(\d+),\s*(\d+),\s*([\d\.]+)$/
 

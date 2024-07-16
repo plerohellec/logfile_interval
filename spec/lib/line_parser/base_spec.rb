@@ -58,15 +58,15 @@ module LogfileInterval
 
     describe 'Broken parsers' do
       class NoRegexLog < Base
+        set_line_parser :logfile_line
+
         add_column :name => 'ip',        :pos => 1, :aggregator => :count
       end
 
       class NoColumnLog < Base
-        set_regex /^([\d\.]+)\s+\S+\s+\S+\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+(\d+)\s+"([^"]*)"\s+"([^"]+)"$/
-      end
+        set_line_parser :logfile_line
 
-      class MissingCustomClass < Base
-        set_regex /(.*)/
+        set_regex /^([\d\.]+)\s+\S+\s+\S+\s+\[(\d\d.*\d\d)\]\s+"(?:GET|POST|PUT|HEAD|DELETE)\s+(\S+)\s+HTTP\S+"\s+(\d+)\s+(\d+)\s+"([^"]*)"\s+"([^"]+)"$/
       end
 
       before :each do

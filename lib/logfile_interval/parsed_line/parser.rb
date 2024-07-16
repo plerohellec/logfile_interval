@@ -27,22 +27,6 @@ module LogfileInterval
         end
       end
 
-      def skip(options)
-        unless options[:pos] && options[:regex]
-          raise ConfigurationError, "skip option must include pos and regex"
-        end
-
-        skip_columns << { pos: options[:pos], regex: options[:regex] }
-      end
-
-      def skip_with_exceptions(options)
-        unless options[:pos] && options[:regex]
-          raise ConfigurationError, "skip option must include pos and regex"
-        end
-
-        skip_columns_with_exceptions << { pos: options[:pos], regex: options[:regex] }
-      end
-
       def create_record(line)
         record = new(line)
         return record if record.valid?
@@ -60,18 +44,6 @@ module LogfileInterval
       end
 
       private
-
-      def validate_column_options(options)
-        validate_option(options, :name)
-        validate_option(options, :pos)
-        validate_option(options, :aggregator)
-        if options[:name].to_s == 'skip'
-          raise ConfigurationError, "'skip' is a reserved column name"
-        end
-        unless Aggregator::Base.exist?(options[:aggregator]) || options[:aggregator] == :timestamp
-          raise ConfigurationError, "aggregator must be one of #{Aggregator::Base.all.join(', ')}"
-        end
-      end
 
       def validate_option(options, key, errmsg = nil)
         raise ConfigurationError, errmsg || "#{key} is a mandatory column option" unless options.has_key?(key)
