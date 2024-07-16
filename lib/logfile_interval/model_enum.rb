@@ -20,6 +20,11 @@ module LogfileInterval
       end
     end
     alias_method :each, :each_parsed_line
+
+    def first_parsed_line
+      each_parsed_line.first
+    end
+    alias_method :first, :first_parsed_line
   end
 end
 
