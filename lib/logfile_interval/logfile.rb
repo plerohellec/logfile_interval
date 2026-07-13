@@ -20,6 +20,7 @@ module LogfileInterval
       return unless exist?
       File.open(@filename) do |f|
         while line = f.gets
+          line = line.chomp
           if record = parser.create_record(line)
             return record.time
           end
