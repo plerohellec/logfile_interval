@@ -1,6 +1,6 @@
 module LogfileInterval
   module ParsedLine
-    class TimingLog < Base
+    class TimingLog < Regex
       # Line format:
       # timestamp, ip, controller#action, total_time, bytes, rss
 
@@ -19,7 +19,7 @@ module LogfileInterval
       end
     end
 
-    class TimingLogWithGrouping < Base
+    class TimingLogWithGrouping < Regex
       # Line format:
       # timestamp, controller#action, total_time, bytes
 

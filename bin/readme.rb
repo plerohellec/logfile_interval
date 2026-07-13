@@ -4,7 +4,7 @@ require 'pp'
 require 'date'
 require File.join(File.expand_path('../../lib', __FILE__), 'logfile_interval')
 
-class AccessLogParsedLine < LogfileInterval::ParsedLine::Base
+class AccessLogParsedLine < LogfileInterval::ParsedLine::Regex
   # Example line:
   # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
 

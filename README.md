@@ -22,7 +22,7 @@ require 'pp'
 require 'date'
 require 'logfile_interval'
 
-class AccessLog < LogfileInterval::ParsedLine::Base
+class AccessLog < LogfileInterval::ParsedLine::Regex
   # Example line:
   # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
 
@@ -86,7 +86,7 @@ for each ip, number of requests grouped by http code:
 ### Write a LineParser class
 The first step is to define a LineParser class as in the example above. The parser lists the fields that must be parsed, how a timestamp can be extracted from each line and how to aggregate values into intervals.
 ```ruby
-class AccessLog < LogfileInterval::ParsedLine::Base
+class AccessLog < LogfileInterval::ParsedLine::Regex
   # Example line:
   # 74.75.19.145 - - [31/Mar/2013:06:54:12 -0700] "GET /ppa/google_chrome HTTP/1.1" 200 7855 "https://www.google.com/" "Mozilla/5.0 Chrome/25.0.1364.160"
 
@@ -108,14 +108,36 @@ class AccessLog < LogfileInterval::ParsedLine::Base
 end
 ```
 #### The parser must define:
-* A regex that extracts the fields out of each line.
+* A regex that extracts the fields out of each line, or a JSON format using :key-based column mapping.
 * A set of columns that will to be parsed and aggregated in time intervals.
 * 0 or more column that will be skipped if the column value matches the specified regex
 * A 'time' method that converts the mandatory timestamp field of a line into a Time object.
 
+#### Parser types
+Two parser types are available, to be chosen based on your log format:
+
+**`LogfileInterval::ParsedLine::Regex`** (or the backward-compatible `Base`) for regex-based parsing:
+```ruby
+class AccessLog < LogfileInterval::ParsedLine::Regex
+  set_regex /^(...)$/
+  add_column :name => 'ip', :pos => 1, :aggregator => :count
+  # ...
+end
+```
+
+**`LogfileInterval::ParsedLine::Json`** for JSON-format log lines:
+```ruby
+class ApiLog < LogfileInterval::ParsedLine::Json
+  add_column :name => 'timestamp', :aggregator => :timestamp
+  add_column :name => 'duration',  :key => 'response_time_ms', :aggregator => :average, :conversion => :integer
+  # ...
+end
+```
+
 #### Attributes of a column:
 * name: a parsed record will have a method with that name returning the value found at that position
-* pos:  the position of the captured field in the regex matched data
+* pos:  the position of the captured field in the regex matched data (use :key instead for JSON)
+* key:  the JSON key to extract the field from (mutually exclusive with :pos, JSON only)
 * aggregator : the aggregation mode for this field
 * conversion: the parser will convert the field to an integer or a float when building the parsed record
 * group_by: group_by value is the name of another field. Values will be aggregated for each 'name', 'group_by' pair.

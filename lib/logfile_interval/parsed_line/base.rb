@@ -7,6 +7,12 @@ module LogfileInterval
 
       extend Parser
 
+      class << self
+        def parse(line)
+          raise NotImplementedError, "Subclass must implement parse(line). Use ParsedLine::Regex for regex or ParsedLine::Json for JSON."
+        end
+      end
+
       def initialize(line)
         @data = self.class.parse(line)
         @valid = @data ? true : false
