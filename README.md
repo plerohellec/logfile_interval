@@ -5,7 +5,7 @@ Logfile parser and aggregator.
 It iterates over 1 or more logfiles, parses each line and aggregates them into time intervals. Each interval object
 includes aggregated data for each field of the logfile.
 
-Aggregated data can be for example the sum, the average value or the number of occurences of each value.
+Aggregated data can be for example the sum, the average value, a percentile or the number of occurences of each value.
 
 ## Example
 This example will parse an access.log file and aggregate the data into 5 minute intervals.
@@ -97,6 +97,7 @@ class AccessLog < LogfileInterval::ParsedLine::Base
   add_column :name => 'code',         :pos => 4, :aggregator => :count
   add_column :name => 'code_by_ip',   :pos => 4, :aggregator => :count,     :group_by => 'ip'
   add_column :name => 'length',       :pos => 5, :aggregator => :average,                      :conversion => :integer
+  add_column :name => 'length_percentile', :pos => 5, :aggregator => :percentile,                                     :conversion => :integer
   add_column :name => 'length_by_ip', :pos => 5, :aggregator => :average,   :group_by => 'ip', :conversion => :integer
 
   skip                                :pos => 3, :regex => /firefox/
@@ -130,6 +131,12 @@ end
 * average: the aggregator will calculate the average value of this field
 * sum: the aggregator will add up the values of this field
 * delta: the aggregator will calculate the difference between each line and the previous one and will average all the deltas
+* percentile: the aggregator stores all values and can compute any percentile at query time.
+  It uses linear interpolation between the two nearest ranked values for precise results.
+  Access the aggregator via `interval.aggregator(:column)` to call `compute_percentile`:
+  ```ruby
+  interval.aggregator(:length_percentile).compute_percentile(95)  # => 48.0
+  ```
 
 ### Iterate through lines of a single file
 And get a parsed record for each line.
@@ -173,6 +180,7 @@ interval_builder.each_interval do |interval|
   puts interval.class  # LogfileInterval::Interval
   puts interval.start_time
   puts interval[:length]
+  puts "95th percentile response length: #{interval.aggregator(:length_percentile).compute_percentile(95)}"
   interval[:ip].each do |ip, count|
     puts "#{ip}, #{count}"
   end

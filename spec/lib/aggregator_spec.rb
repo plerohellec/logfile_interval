@@ -16,6 +16,7 @@ module LogfileInterval
         Aggregator::Base.klass(:average).should == Average
         Aggregator::Base.klass(:count).should == Count
         Aggregator::Base.klass(:delta).should == Delta
+        Aggregator::Base.klass(:percentile).should == Percentile
         Aggregator::Base.klass(:custom_aggregator).should == CustomAggregator
         Aggregator::Base.klass(:weird_add).should == BizarroAggregator
       end
@@ -66,7 +67,7 @@ module LogfileInterval
       end
     end
 
-    [ NumLines, Count, Sum, Average, Delta ]. each do |klass|
+    [ NumLines, Count, Sum, Average, Delta, Percentile ]. each do |klass|
       describe klass do
         it_behaves_like 'an aggregator'
       end
@@ -121,6 +122,78 @@ module LogfileInterval
           g.add('200')
           g.value.should == 0
           g.values.size.should == 3
+        end
+      end
+
+      describe Percentile do
+        it 'returns the median (p50) by default' do
+          p = Percentile.new
+          p.add(1)
+          p.add(3)
+          p.add(5)
+          p.value.should == 3
+        end
+
+        it 'computes any percentile at query time' do
+          p = Percentile.new
+          p.add(1)
+          p.add(2)
+          p.add(3)
+          p.add(4)
+          p.add(5)
+          p.compute_percentile(50).should == 3
+          p.compute_percentile(95).should == 4.8
+          p.compute_percentile(99).should == 4.96
+        end
+
+        it 'returns 0 when no values added' do
+          p = Percentile.new
+          p.value.should == 0
+        end
+
+        it 'returns 0 for compute_percentile on empty set' do
+          p = Percentile.new
+          p.compute_percentile(95).should == 0
+        end
+
+        it 'returns the only value for a single element' do
+          p = Percentile.new
+          p.add(42)
+          p.value.should == 42
+        end
+
+        it 'computes percentile with interpolation at the boundary' do
+          p = Percentile.new
+          p.add(1)
+          p.add(2)
+          p.add(3)
+          p.compute_percentile(100).should == 3
+        end
+
+        it 'computes percentile per group' do
+          p = Percentile.new
+          p.add(10, :a)
+          p.add(20, :a)
+          p.add(30, :a)
+          p.add(100, :b)
+          p.add(200, :b)
+          p.compute_percentile(50, :a).should == 20
+          p.compute_percentile(50, :b).should == 150
+          p.compute_percentile(95, :b).should == 195
+        end
+
+        it 'returns the median through the AggregatorSet pipeline' do
+          cols = {
+            :val => { :aggregator_class => Percentile, :custom_options => {} },
+          }
+          set = AggregatorSet.new(cols)
+          rec = double('record', :[] => 100, :skip_with_exceptions? => false)
+          set.add(rec)
+          rec2 = double('record', :[] => 200, :skip_with_exceptions? => false)
+          set.add(rec2)
+          rec3 = double('record', :[] => 300, :skip_with_exceptions? => false)
+          set.add(rec3)
+          set[:val].should == 200
         end
       end
     end

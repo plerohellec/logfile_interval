@@ -19,6 +19,12 @@ module LogfileInterval
       @aggregators[name]
     end
 
+    # Returns the raw aggregator object for +name+, giving access to
+    # aggregator-specific query methods beyond +value+/+values+.
+    def aggregator(name)
+      @aggregators.aggregator(name)
+    end
+
     def to_hash
       h = @aggregators.to_hash
       h[:start_time] = self.start_time

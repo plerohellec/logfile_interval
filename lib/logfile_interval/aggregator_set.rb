@@ -26,6 +26,12 @@ module LogfileInterval
       @aggregators[name.to_sym].values
     end
 
+    # Returns the raw aggregator object for +name+.
+    def aggregator(name)
+      raise ArgumentError, "#{name} field does not exist" unless @aggregators.has_key?(name)
+      @aggregators[name.to_sym]
+    end
+
     def to_hash
       @aggregators.inject({}) do |h, pair|
         k = pair[0]
