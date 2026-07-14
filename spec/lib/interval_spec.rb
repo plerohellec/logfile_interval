@@ -15,8 +15,8 @@ module LogfileInterval
       interval.size.should == 0
       interval[:total_time].should == 0
       interval[:num_bytes].should == 0
-      interval[:action].should == 0
-      interval[:ip].should == 0
+      interval[:action].should == {}
+      interval[:ip].should == {}
     end
 
     context :to_hash do
@@ -41,12 +41,12 @@ module LogfileInterval
         hinterval.keys.should include(:start_time, :end_time)
       end
 
-      it 'with no data, should have keys with 0 values' do
+      it 'with no data, should have keys with 0 or {} values' do
         interval = Interval.new(@end_time, @length, ParsedLine::TimingLog.columns)
         hinterval = interval.to_hash
         hinterval[:num_lines].should == 0
-        hinterval[:ip].should == 0
-        hinterval[:action].should == 0
+        hinterval[:ip].should == {}
+        hinterval[:action].should == {}
         hinterval[:total_time].should == 0
         hinterval[:num_bytes].should == 0
         hinterval[:rss].should == 0

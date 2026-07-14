@@ -1,6 +1,10 @@
 module LogfileInterval
   module Aggregator
     class Count < Base
+      def single_value?
+        false
+      end
+
       def each
         @val.each { |k, v| yield k, v }
       end

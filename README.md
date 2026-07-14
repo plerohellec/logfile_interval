@@ -149,9 +149,7 @@ All built-in aggregators skip `nil` values gracefully: they do not contribute to
 * timestamp: the timestamp field will be used to determine to which interval the line belongs, each line MUST have a timestamp
 * num_lines: the most simple aggregator simply counts the number of lines
 * count: the aggregator will count the number of occurence of this field
-  * without the group_by option, it will just count the total number of lines (probably useless)
-  * with a group_by option pointing to the same field as the current one, it will count the number of occurence
-    per distinct value of this column
+  * without the group_by option, it will count the number of occurences per distinct value of this column
   * with a group_by option pointing to another field, it will count the number of occurences of (this field, other field) pairs.
 * average: the aggregator will calculate the average value of this field
 * sum: the aggregator will add up the values of this field

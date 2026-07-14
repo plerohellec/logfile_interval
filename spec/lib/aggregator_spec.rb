@@ -114,14 +114,13 @@ module LogfileInterval
       end
 
       describe Count do
-        it 'groups values and increment counters' do
+        it 'without group_by: counts occurrences per distinct value' do
           g = Count.new
           g.add('200')
           g.add('500')
           g.add('301')
           g.add('200')
-          g.value.should == 0
-          g.values.size.should == 3
+          g.values.should == { '200' => 2, '500' => 1, '301' => 1 }
         end
       end
 
@@ -273,6 +272,13 @@ module LogfileInterval
           c.values.should == { '200' => 2 }
         end
 
+        it 'returns empty hash when all values are nil' do
+          c = Count.new
+          c.add(nil)
+          c.add(nil)
+          c.values.should == {}
+        end
+
         it 'ignores nil values with group_by' do
           c = Count.new
           c.add(:key1, :group_a)
@@ -368,44 +374,29 @@ module LogfileInterval
       end
 
       describe Count do
-        it 'groups values and increment counters' do
-          g = Count.new
-          g.add('200')
-          g.add('500')
-          g.add('301')
-          g.add('200')
-          g.values.should be_a(Hash)
-          g.values.should include({'200' => 2})
-          g.values.should include({'301' => 1})
-          g.values.should include({'500' => 1})
-        end
-
-        it 'each yields a key and a hash' do
+        it 'with group_by to another field: counts (value, group_value) pairs' do
           gac = Count.new
           gac.add :key1, :subkey1
-          gac.first.should be_an(Array)
-          gac.first.size.should == 2
-          gac.first[1].should be_a(Hash)
+          gac.add :key1, :subkey2
+          gac.add :key2, :subkey1
+          gac.add :key2, :subkey1
+          gac.add :key2, :subkey3
+
+          gac.values[:key1][:subkey1].should == 1
+          gac.values[:key1][:subkey2].should == 1
+          gac.values[:key2][:subkey1].should == 2
+          gac.values[:key2][:subkey2].should == 0
+          gac.values[:key2][:subkey3].should == 1
         end
 
-        context :add do
-          before :each do
-            @gac = Count.new
-          end
+        it 'with group_by to the same field: each value maps to itself in a nested hash' do
+          gac = Count.new
+          gac.add '200', '200'
+          gac.add '200', '200'
+          gac.add '500', '500'
 
-          it 'counts number of occurence of subkey for key' do
-            @gac.add :key1, :subkey1
-            @gac.add :key1, :subkey2
-            @gac.add :key2, :subkey1
-            @gac.add :key2, :subkey1
-            @gac.add :key2, :subkey3
-
-            @gac.values[:key1][:subkey1].should == 1
-            @gac.values[:key1][:subkey2].should == 1
-            @gac.values[:key2][:subkey1].should == 2
-            @gac.values[:key2][:subkey2].should == 0
-            @gac.values[:key2][:subkey3].should == 1
-          end
+          gac.values['200']['200'].should == 2
+          gac.values['500']['500'].should == 1
         end
       end
 
