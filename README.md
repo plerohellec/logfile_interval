@@ -134,6 +134,9 @@ class ApiLog < LogfileInterval::ParsedLine::Json
 end
 ```
 
+When a JSON line is missing a key that a column expects, the field value is `nil`.
+All built-in aggregators skip `nil` values gracefully: they do not contribute to sums, averages, counts, deltas, percentiles, value sets, or line counts.
+
 #### Attributes of a column:
 * name: a parsed record will have a method with that name returning the value found at that position
 * pos:  the position of the captured field in the regex matched data (use :key instead for JSON)

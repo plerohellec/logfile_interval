@@ -7,7 +7,10 @@ module LogfileInterval
       end
 
       def add(value, group_by = nil)
-        @val[key(group_by)] = value
+        return if value.nil?
+        if !@val[key(group_by)]
+          @val[key(group_by)] = value
+        end
         @size.increment(key(group_by))
       end
     end

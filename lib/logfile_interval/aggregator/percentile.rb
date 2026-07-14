@@ -7,6 +7,7 @@ module LogfileInterval
       end
 
       def add(value, group_by = nil)
+        return if value.nil?
         k = key(group_by)
         @val[k] ||= []
         @val[k] << value

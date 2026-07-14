@@ -6,6 +6,7 @@ module LogfileInterval
       end
 
       def add(value, group_by_value = nil)
+        return if value.nil?
         if group_by_value
           @val.increment_subkey(value, key(group_by_value))
         else
